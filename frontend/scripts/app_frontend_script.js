@@ -1,11 +1,3 @@
-let platform = "GitHub";
-var API_URL = "";
-
-if(platform.toLowerCase() == "github")
-{
-    API_URL = "https://dragos-vacariu-note-taking.vercel.app";
-}
-
 const enabledEditableDivBorderStyle = "inset 1px rgba(0,0,0,0.5)";
 
 window.onload = function() {
