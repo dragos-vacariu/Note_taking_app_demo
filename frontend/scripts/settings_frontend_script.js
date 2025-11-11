@@ -1,7 +1,7 @@
-let domain = "GitHub";
+let platform = "GitHub";
 var API_URL = "";
 
-if(domain.toLowerCase() == "github")
+if(platform.toLowerCase() == "github")
 {
     API_URL = "https://dragos-vacariu-note-taking.vercel.app";
 }
