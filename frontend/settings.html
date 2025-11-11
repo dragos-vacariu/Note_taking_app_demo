@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Settings - Note Taking App</title>
+    <link rel="stylesheet" href="./styles/settings_style.css" />
+    <link rel="stylesheet" href="./styles/global.css" />
+    <script src="./scripts/auth_frontend_script.js"></script>
+</head>
+<body>
+    <div id="page_title">Note Taking App <sup>-> Settings</sup></div>
+    <nav class="app-nav">
+        <a href="/frontend/app.html">Home</a>
+        <a href="/frontend/settings.html" class="selected_link">Settings</a>
+        <a href="/frontend/logout.html">Logout</a>
+    </nav>
+    <div id="form_container">
+        <form id="updateEmailForm">
+            <h3>Change Email</h3>
+            <label for="newEmail">New Email:</label>
+            <input type="email" id="newEmail" required />
+            <button type="submit">Update Email</button>
+            <div id="emailMessage"></div>
+        </form>
+
+        <hr />
+
+        <form id="updatePasswordForm">
+            <h3>Change Password</h3>
+            <label for="currentPassword">Current Password:</label>
+            <input type="password" id="currentPassword" required />
+            <label for="newPassword">New Password:</label>
+            <input type="password" id="newPassword" required />
+            <label for="confirmPassword">Confirm New Password:</label>
+            <input type="password" id="confirmPassword" required />
+            <button type="submit">Update Password</button>
+          <div id="passwordMessage"></div>
+        </form>
+    </div>
+
+    <script src="./scripts/settings_frontend_script.js"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+:root 
+{
+    --background-gradient: linear-gradient(to right, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+}
+
+body 
+{
+    background: var(--background-gradient);
+}
+
+#page_content #menu
+{
+    position:relative;
+    
+    display: inline-block;
+    border: none 1px blue;
+    width: 99%;
+    margin: 0% 0.5%;
+    
+    /*The following will ensure that the width of the element will not grow with the added border-size.
+    So the border will be within the defined element width.
+    */
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+#journalled_content
+{
+    margin: 0.5%;
+}
+
+#logged_user_info{
+    font: var(--user-logged-font);
+    background-color: var(--light-gray-color);
+    color: var(--darkbrown-color);
+    margin: 5px;
+    padding:5px;
+    letter-spacing: 0.5px;
+}
+
+#logged_user_info #user{
+    color: var(--blue-color);
+    font-weight: bold;
+}
+
+.jour_entry
+{
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    margin:  10px 0px;
+    padding: 5px;
+    border: inset 1px rgba(0,0,0,0);
+    border-radius: 0.5vw;
+    background-color: var(--light-gray-color);
+    /*The following will ensure that the width of the element will not grow with the added border-size.
+    So the border will be within the defined element width.
+    */
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+.jour_entry_title
+{
+    background-color: var(--light-gray-color);
+    font: var(--post-title-font);
+    color: var(--darkblue-color);
+    width: 98%;
+    margin: 2px 1%;
+    padding: 0.5% 1%;
+    border-radius: 1vw;
+    /*The following will ensure that the width of the element will not grow with the added border-size.
+    So the border will be within the defined element width.
+    */
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+.jour_entry_content
+{
+    background-color: var(--light-gray-color);
+    font: var(--post-content-font); 
+    color: black;
+    field-sizing: content;
+    width: 98%;
+    margin: 1%;
+    padding: 0.5%;
+    border-radius: 1vw;
+    /*The following will ensure that the width of the element will not grow with the added border-size.
+    So the border will be within the defined element width.
+    */
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+/* Basic styling for the button */
+.dropdown 
+{
+    position: relative;
+    display: inline-block;
+    margin: 0.5% 1%;
+}
+
+/* Container for the dropdown menu */
+.dropdown-content 
+{
+    display: none; /* Hidden by default */
+    position: absolute;
+    background-color: var(--light-gray-color);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Style for each menu item */
+.dropdown-content a 
+{
+    color: black;
+    font: var(--button-font);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Hover effect for menu items */
+.dropdown-content a:hover 
+{
+    background-color: #ddd;
+}
+
+/* Show the menu when active */
+.show 
+{
+    display: block;
+}
