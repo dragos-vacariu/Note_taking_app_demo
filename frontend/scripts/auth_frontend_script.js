@@ -86,7 +86,7 @@ async function validateTokenWithBackend()
     
     try
     {
-        const res = await fetch(API_URL + '/api/backend_api_manager', {
+        const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
             method: 'POST',
             headers: authHeaders(),
             

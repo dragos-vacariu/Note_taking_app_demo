@@ -63,7 +63,7 @@ function loadNotes()
     // Show logged user info
     showLoggedUser();
 
-    fetch(API_URL + '/api/backend_api_manager', {
+    fetch(API_URL + '/api/backend_api_manager_for_github', {
         method: 'POST',
         headers: authHeaders(),
         
@@ -179,7 +179,7 @@ function saveEdit()
         notesCache.push({ id: noteId, title, content });
     }
 
-    fetch(API_URL + '/api/backend_api_manager', {
+    fetch(API_URL + '/api/backend_api_manager_for_github', {
         method: 'POST',
         headers: authHeaders(),
         
@@ -216,7 +216,7 @@ function remove_entry() {
     const idx = notesCache.findIndex(n => n.id === noteId);
     if (idx !== -1) notesCache.splice(idx, 1);
 
-    fetch(API_URL + '/api/backend_api_manager', {
+    fetch(API_URL + '/api/backend_api_manager_for_github', {
         method: 'POST',
         headers: authHeaders(),
         

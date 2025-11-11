@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try
         {
             const token = getToken();
-            const res = await fetch(API_URL + '/api/backend_api_manager', {
+            const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
                 method: 'POST',
                 headers: authHeaders(),
                 
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const token = getToken();
-            const res = await fetch(API_URL + '/api/backend_api_manager', {
+            const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
                 method: 'POST',
                 headers: authHeaders(),
                 

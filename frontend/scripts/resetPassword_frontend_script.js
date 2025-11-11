@@ -32,7 +32,7 @@ document.getElementById('changePasswordForm').addEventListener('submit', async (
     }
 
     try {
-        const res = await fetch(API_URL + '/api/backend_api_manager', {
+        const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             

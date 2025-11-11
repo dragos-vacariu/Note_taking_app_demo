@@ -41,7 +41,7 @@ async function verifyEmail(token)
     try {
         //const res = await fetch(`/api/verifyEmail_backend?token=${token}`);
         
-        const res = await fetch(`${API_URL}/api/backend_api_manager?token=${token}`, {
+        const res = await fetch(`${API_URL}/api/backend_api_manager_for_github?token=${token}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 
@@ -95,7 +95,7 @@ async function resendBtnFunction(e)
 
     try
     {
-        const res = await fetch(API_URL + '/api/backend_api_manager', {
+        const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 

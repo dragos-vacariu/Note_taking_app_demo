@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     {
         try {
             // Validate token with backend
-            const res = await fetch(API_URL + '/api/backend_api_manager', {
+            const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -148,7 +148,7 @@ function LogIn_SignUp()
         const endpoint_function = mode === 'login' ? 'userLogin' : 'userSignUp';
         
         try {
-            const res = await fetch(API_URL + '/api/backend_api_manager', {
+            const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 
@@ -253,7 +253,7 @@ function showResendVerification(user_email)
 
         try
         {
-            const res = await fetch(API_URL + '/api/backend_api_manager', {
+            const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 
@@ -289,10 +289,7 @@ function showResendVerification(user_email)
 
 async function LogIn_AsGuest()
 {
-    const form = document.getElementById('authForm');
-    const toggleBtn = document.getElementById('toggleMode');
     const messageDiv = document.getElementById('message');
-    const extraOptions = document.getElementById('extraOptions');
 
     let mode = 'login'; // default mode
     
@@ -312,7 +309,7 @@ async function LogIn_AsGuest()
     }
     
     try {
-            const res = await fetch(API_URL + '/api/backend_api_manager', {
+            const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 
@@ -368,11 +365,6 @@ async function LogIn_AsGuest()
             {
                 messageDiv.style.color = 'red';
                 messageDiv.innerText = data.message || 'Something went wrong';
-
-                if (data.message?.includes('not verified'))
-                {
-                    showResendVerification(user_email);
-                }
             }
         }
         catch (err)
