@@ -1,4 +1,4 @@
-const domain = "GitHub";
+let domain = "GitHub";
 var API_URL = "";
 
 if(domain.toLowerCase() == "github")
