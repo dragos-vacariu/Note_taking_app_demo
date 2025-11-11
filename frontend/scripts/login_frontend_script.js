@@ -204,7 +204,7 @@ function LogIn_SignUp()
                 {
                     messageDiv.innerText = 'Login successful! Redirecting...';
                     setTimeout(() => {
-                        window.location.href = '/frontend/app.html';
+                        window.location.href = 'https://dragos-vacariu.github.io/Note_taking_app_demo/frontend/app.html';
                     }, 1000);
                 }
             }
@@ -358,7 +358,7 @@ async function LogIn_AsGuest()
 
                 messageDiv.innerText = 'Login successful! Redirecting...';
                 setTimeout(() => {
-                    window.location.href = '/frontend/app.html';
+                    window.location.href = 'https://dragos-vacariu.github.io/Note_taking_app_demo/frontend/app.html';
                 }, 1000);
             }
             else
