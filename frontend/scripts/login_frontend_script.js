@@ -287,8 +287,12 @@ function showResendVerification(user_email)
     messageDiv.appendChild(link);
 }
 
+function LogIn_AsGuest()
+{
+    await LogingIn_AsGuest();
+}
 
-async function LogIn_AsGuest()
+async function LogingIn_AsGuest()
 {
     const form = document.getElementById('authForm');
     const toggleBtn = document.getElementById('toggleMode');
