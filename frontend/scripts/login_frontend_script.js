@@ -385,3 +385,5 @@ async function LogingIn_AsGuest()
             console.error('Network or fetch error:', err);
         }
 }
+
+document.getElementById("login_as_guest_button").onclick = LogIn_AsGuest;
