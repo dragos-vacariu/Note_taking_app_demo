@@ -288,7 +288,7 @@ function showResendVerification(user_email)
 }
 
 
-function LogIn_AsGuest()
+async function LogIn_AsGuest()
 {
     const form = document.getElementById('authForm');
     const toggleBtn = document.getElementById('toggleMode');
