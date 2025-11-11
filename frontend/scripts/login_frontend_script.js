@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (res.ok) 
             {
                 // Token is valid, redirect user to app
-                window.location.href = '/frontend/app.html';
+                window.location.href = 'https://dragos-vacariu.github.io/Note_taking_app_demo/frontend/app.html';
                 return; // stop execution
             }
             else 
