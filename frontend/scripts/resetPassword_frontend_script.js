@@ -1,3 +1,11 @@
+const domain = "GitHub";
+var API_URL = "";
+
+if(domain.toLowerCase() == "github")
+{
+    API_URL = "https://dragos-vacariu-note-taking.vercel.app";
+}
+
 document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
     
     e.preventDefault();
@@ -24,7 +32,7 @@ document.getElementById('changePasswordForm').addEventListener('submit', async (
     }
 
     try {
-        const res = await fetch('/api/backend_api_manager', {
+        const res = await fetch(API_URL + '/api/backend_api_manager', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             

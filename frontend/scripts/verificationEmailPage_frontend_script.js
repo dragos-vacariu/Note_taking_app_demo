@@ -1,3 +1,12 @@
+const domain = "GitHub";
+var API_URL = "";
+
+if(domain.toLowerCase() == "github")
+{
+    API_URL = "https://dragos-vacariu-note-taking.vercel.app";
+}
+
+
 // Top-level variables accessible to both functions
 const messageEl = document.querySelector('.message');
 const resendBtn = document.getElementById('resendBtn');
@@ -32,7 +41,7 @@ async function verifyEmail(token)
     try {
         //const res = await fetch(`/api/verifyEmail_backend?token=${token}`);
         
-        const res = await fetch(`/api/backend_api_manager?token=${token}`, {
+        const res = await fetch(`${API_URL}/api/backend_api_manager?token=${token}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 
@@ -86,7 +95,7 @@ async function resendBtnFunction(e)
 
     try
     {
-        const res = await fetch('/api/backend_api_manager', {
+        const res = await fetch(API_URL + '/api/backend_api_manager', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 

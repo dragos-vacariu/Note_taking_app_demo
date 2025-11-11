@@ -1,4 +1,10 @@
-// app_frontend_script.js
+const domain = "GitHub";
+var API_URL = "";
+
+if(domain.toLowerCase() == "github")
+{
+    API_URL = "https://dragos-vacariu-note-taking.vercel.app";
+}
 
 const enabledEditableDivBorderStyle = "inset 1px rgba(0,0,0,0.5)";
 
@@ -57,7 +63,7 @@ function loadNotes()
     // Show logged user info
     showLoggedUser();
 
-    fetch('/api/backend_api_manager', {
+    fetch(API_URL + '/api/backend_api_manager', {
         method: 'POST',
         headers: authHeaders(),
         
@@ -173,7 +179,7 @@ function saveEdit()
         notesCache.push({ id: noteId, title, content });
     }
 
-    fetch('/api/backend_api_manager', {
+    fetch(API_URL + '/api/backend_api_manager', {
         method: 'POST',
         headers: authHeaders(),
         
@@ -210,7 +216,7 @@ function remove_entry() {
     const idx = notesCache.findIndex(n => n.id === noteId);
     if (idx !== -1) notesCache.splice(idx, 1);
 
-    fetch('/api/backend_api_manager', {
+    fetch(API_URL + '/api/backend_api_manager', {
         method: 'POST',
         headers: authHeaders(),
         

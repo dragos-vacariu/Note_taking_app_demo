@@ -1,3 +1,12 @@
+const domain = "GitHub";
+var API_URL = "";
+
+if(domain.toLowerCase() == "github")
+{
+    API_URL = "https://dragos-vacariu-note-taking.vercel.app";
+}
+
+
 document.addEventListener('DOMContentLoaded', async () => {
     const payload = requireLogin(); // local JWT validation
     
@@ -24,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try
         {
             const token = getToken();
-            const res = await fetch('/api/backend_api_manager', {
+            const res = await fetch(API_URL + '/api/backend_api_manager', {
                 method: 'POST',
                 headers: authHeaders(),
                 
@@ -63,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const token = getToken();
-            const res = await fetch('/api/backend_api_manager', {
+            const res = await fetch(API_URL + '/api/backend_api_manager', {
                 method: 'POST',
                 headers: authHeaders(),
                 

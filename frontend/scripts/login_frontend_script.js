@@ -1,3 +1,11 @@
+const domain = "GitHub";
+var API_URL = "";
+
+if(domain.toLowerCase() == "github")
+{
+    API_URL = "https://dragos-vacariu-note-taking.vercel.app";
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
     
@@ -6,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     {
         try {
             // Validate token with backend
-            const res = await fetch('/api/backend_api_manager', {
+            const res = await fetch(API_URL + '/api/backend_api_manager', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -140,7 +148,7 @@ function LogIn_SignUp()
         const endpoint_function = mode === 'login' ? 'userLogin' : 'userSignUp';
         
         try {
-            const res = await fetch('/api/backend_api_manager', {
+            const res = await fetch(API_URL + '/api/backend_api_manager', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 
@@ -245,7 +253,7 @@ function showResendVerification(user_email)
 
         try
         {
-            const res = await fetch('/api/backend_api_manager', {
+            const res = await fetch(API_URL + '/api/backend_api_manager', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 
@@ -277,4 +285,99 @@ function showResendVerification(user_email)
 
     const messageDiv = document.getElementById('message');
     messageDiv.appendChild(link);
+}
+
+
+function LogIn_AsGuest()
+{
+    const form = document.getElementById('authForm');
+    const toggleBtn = document.getElementById('toggleMode');
+    const messageDiv = document.getElementById('message');
+    const extraOptions = document.getElementById('extraOptions');
+
+    let mode = 'login'; // default mode
+    
+    const user_email = "guest@admin_drva_apps.com";
+    const password = "demoLMI09238#!";
+    
+    if (!user_email || !password) 
+    {
+        messageDiv.innerText = 'Please enter both email and password.';
+        return;
+    }
+    
+    if (!/\S+@\S+\.\S+/.test(user_email)) 
+    {
+        messageDiv.innerText = 'Please enter a valid email';
+        return;
+    }
+    
+    try {
+            const res = await fetch(API_URL + '/api/backend_api_manager', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                
+                //HTTP can only send strings through web... JSON.stringify my content
+                body: JSON.stringify({
+                    user_email: user_email,
+                    password: password,
+                    method_name: "userLogin",
+                    method_params: {}
+                })
+            });
+
+            let data;
+            
+            try
+            {
+                data = await res.json();
+            }
+            
+            catch (err) 
+            {
+                console.error('Failed to parse JSON:', err);
+                submitBtn.disabled = false;  // re-enable
+                return;
+            }
+
+            if (res.ok) 
+            {
+                // Get the "Keep me logged in" checkbox value (if in login mode)
+                const rememberMeCheckbox = document.getElementById('rememberMe');
+                const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
+
+                const token = data.token;
+
+                // Save token to correct storage
+                if(rememberMe)
+                {
+                    localStorage.setItem('jwt_token', token);
+                } 
+                else
+                {
+                    sessionStorage.setItem('jwt_token', token);
+                }
+
+                messageDiv.style.color = 'green';
+
+                messageDiv.innerText = 'Login successful! Redirecting...';
+                setTimeout(() => {
+                    window.location.href = '/frontend/app.html';
+                }, 1000);
+            }
+            else
+            {
+                messageDiv.style.color = 'red';
+                messageDiv.innerText = data.message || 'Something went wrong';
+
+                if (data.message?.includes('not verified'))
+                {
+                    showResendVerification(user_email);
+                }
+            }
+        }
+        catch (err)
+        {
+            console.error('Network or fetch error:', err);
+        }
 }

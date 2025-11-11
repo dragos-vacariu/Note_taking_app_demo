@@ -1,3 +1,12 @@
+const domain = "GitHub";
+var API_URL = "";
+
+if(domain.toLowerCase() == "github")
+{
+    API_URL = "https://dragos-vacariu-note-taking.vercel.app";
+}
+
+
 // Returns token from localStorage (persistent) or sessionStorage (session)
 function getToken() {
     return localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
@@ -77,7 +86,7 @@ async function validateTokenWithBackend()
     
     try
     {
-        const res = await fetch('/api/backend_api_manager', {
+        const res = await fetch(API_URL + '/api/backend_api_manager', {
             method: 'POST',
             headers: authHeaders(),
             
