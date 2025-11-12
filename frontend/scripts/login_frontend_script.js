@@ -48,10 +48,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             LogIn_SignUp();
         }
     }
-    else
-    {
-        LogIn_SignUp();
-    }
 });
 
 
@@ -61,6 +57,11 @@ function LogIn_SignUp()
     const toggleBtn = document.getElementById('toggleMode');
     const messageDiv = document.getElementById('message');
     const extraOptions = document.getElementById('extraOptions');
+    
+    document.querySelector('input[name="password"]').setAttribute('required', '');
+    document.querySelector('input[name="email_address"]').setAttribute('required', '');
+    document.querySelector('input[name="password"]').required = true;
+    document.querySelector('input[name="email_address"]').required = true;
 
     let mode = 'login'; // default mode
     
@@ -376,4 +377,5 @@ async function LogIn_AsGuest()
         }
 }
 
+document.getElementById("login_sigup").onclick = LogIn_SignUp;
 document.getElementById("login_as_guest_button").onclick = LogIn_AsGuest;
