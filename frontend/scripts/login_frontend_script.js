@@ -290,12 +290,15 @@ function showResendVerification(user_email)
 async function LogIn_AsGuest()
 {
     const messageDiv = document.getElementById('message');
+    document.querySelector('input[name="password"]').removeAttribute('required');
+    document.querySelector('input[name="email_address"]').removeAttribute('required');
 
     let mode = 'login'; // default mode
     
     const user_email = "guest@admin_drva_apps.com";
     const password = "demoLMI09238#!";
     
+    /*
     if (!user_email || !password) 
     {
         messageDiv.innerText = 'Please enter both email and password.';
@@ -306,7 +309,7 @@ async function LogIn_AsGuest()
     {
         messageDiv.innerText = 'Please enter a valid email';
         return;
-    }
+    }*/
     
     try {
             const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {

@@ -1,20 +1,48 @@
-<!DOCTYPE html >
+<!DOCTYPE html>
 <html  ng-app="myApplication" ng-controller="Controller">
     <head>
         <title>Logout - Note Taking App</title>
+        
+    
+        <meta name="viewport" content="width=device-width, initial-scale=1" /> <!--For mobile viewport proper resizing-->
+        <meta name="description" content="Portfolio implemented as means to present and/or demonstrate professional skills, work and efforts put into practice for building up a reliable knowledge foundation to facilitate the adaptability within a new environment, industry, toolchain workplace or with various technologies within the IT industry.">
+        <meta name="keywords" content="HTML,CSS,XML,JavaScript,C,C++,C#,Java,Python,Unity,Programming,IT,Learning,Portal,Projects,Github,Skills,Documentation,Exercise,Examples,Coding,Samples,LinkedIn,Online,Software,Engineering,Scripts,Games,Web,Development,CV,Demonstration,Practice,Electronic,Automation,Computers,Systems,Challenge,AI,Repositories,Tips,Tricks,Know,How,To">
+        <meta name="author" content="Vacariu Dragos">
+        <link rel="icon" type="image/x-icon" href="../../website_resources/global/images/favicon.ico">
+        <!--Global resources-->
+        <link rel="stylesheet" href="../../website_resources/global/css/global.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
         <link rel="stylesheet" href="./styles/global.css">
+        <link rel="stylesheet" href="./styles/portfolio_style.css">
+        <script src="./scripts/auth_frontend_script.js"></script>
     </head>
     <body>
-        <div id="page_title">Note Taking App <sup>-> Logout</sup></div>
-        <nav class="app-nav">
-            <a href="./app.html">Home</a>
-            <a href="./settings.html">Settings</a>
-            <a href="./logout.html" class="selected_link">Logout</a>
-        </nav>
-        <div id="form_container">
-            <h3>Logging out...</h3>
+        <header id="page_header">
+            <!--The content will be added from javascript-->
+        </header>
+        <div id="page_block">
+            <h2>Catalogue -> <a href={{javascript_webapps_page.value}}>{{javascript_webapps_page.name}}</a> -> AI Pal Chatbot</h2>
+
+            <div id="app_page_content">
+                <div id="page_title">Note Taking App <sup>-> Logout</sup></div>
+                <nav class="app-nav">
+                    <a href="./app.html">Home</a>
+                    <a href="./settings.html">Settings</a>
+                    <a href="./logout.html" class="selected_link">Logout</a>
+                </nav>
+                <div id="form_container">
+                    <h3>Logging out...</h3>
+                </div>
+            </div>
         </div>
+        <footer id="page_footer">
+            <!--The content will be added from javascript-->
+        </footer> 
+        <!--The frontend script should be added/loaded at the end, because we need the div elements to exist in the document-->
+          <script src="./scripts/logout_frontend_script.js" type="module"></script>
+        <!--Global resources-->
+        <script src="../../website_resources/global/scripts/global_script.js"></script>
+        <script src="../../website_resources/global/scripts/catalogue_item_selection_styling.js"></script>
     </body>
 </html>
-<!--The frontend script should be added/loaded at the end, because we need the div elements to exist in the document-->
-<script src="./scripts/logout_frontend_script.js" type="module"></script>
