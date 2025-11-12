@@ -2,7 +2,7 @@ function logoutUser()
 {
     localStorage.removeItem('jwt_token');
     sessionStorage.removeItem('jwt_token');
-    window.location.href = '/frontend/login.html';
+    window.location.href = './login.html';
 }
 
 window.onload = function() {
@@ -10,6 +10,6 @@ window.onload = function() {
     logoutUser();
     
     setTimeout(() => {
-        window.location.href = '/frontend/login.html';
+        window.location.href = './login.html';
     }, 1000);
 };
