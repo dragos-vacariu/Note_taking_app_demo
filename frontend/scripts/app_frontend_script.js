@@ -161,15 +161,15 @@ function textFormatting_KeyboardShortcuts(e)
         
         if (editableDiv.contentEditable == true)
         {
-            if (e.ctrlKey && e.key === "h" ) { // Ctrl+H for highlight
+            if (e.ctrlKey && e.key === "," ) { // Ctrl+H for highlight
                 e.preventDefault();
                 document.execCommand("hiliteColor", false, "yellow");
             }
-            if (e.ctrlKey && e.key === "l") { // Ctrl+L for bullet list
+            if (e.ctrlKey && e.key === ".") { // Ctrl+L for bullet list
                 e.preventDefault();
                 document.execCommand("insertUnorderedList");
             }
-            if (e.ctrlKey && e.key === "s") { // Ctrl+S for strikethrough
+            if (e.ctrlKey && e.key === ";") { // Ctrl+S for strikethrough
                 e.preventDefault();
                 document.execCommand("strikeThrough");
             }
