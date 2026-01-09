@@ -90,10 +90,13 @@ function loadNotes()
 
 function addNoteToUI(title, content, id, edit_mode=false) 
 {
+    //CREATING A POST
     const entryDiv = document.createElement('div');
     entryDiv.className = 'jour_entry';
     entryDiv.dataset.id = id;
-
+    
+    //============================================================
+    //ADDING BUTTONS AND FORM ELEMENTS
     const dropdownDiv = document.createElement('div');
     dropdownDiv.className = 'dropdown';
 
@@ -113,6 +116,8 @@ function addNoteToUI(title, content, id, edit_mode=false)
     const editBtn = document.createElement('a');
     editBtn.innerText = 'Edit';
     editBtn.href = '#';
+    editBtn.id = 'editButton';
+
     editBtn.onclick = function() {
         toggleEdit.call(this); 
     };
@@ -123,15 +128,17 @@ function addNoteToUI(title, content, id, edit_mode=false)
     removeBtn.href = '#';
     removeBtn.onclick = remove_entry;
     dropdownContentDiv.appendChild(removeBtn);
-
+    
+    //============================================================
+    //ADDING THE DATA TO THE POST
     const titleDiv = document.createElement('div');
     titleDiv.className = 'jour_entry_title';
-    titleDiv.innerText = title;
+    titleDiv.innerHTML = title;
     titleDiv.contentEditable = false;
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'jour_entry_content';
-    contentDiv.innerText = content;
+    contentDiv.innerHTML = content;
     contentDiv.contentEditable = false;
 
     entryDiv.appendChild(dropdownDiv);
@@ -157,8 +164,7 @@ function saveEdit()
     const noteId = entry_post.dataset.id;
     const title = entry_post.children[1].innerHTML;
     const content = entry_post.children[2].innerHTML;
-    console.log("TITLE: " + title);
-    console.log("CONTENT: " + content);
+
     const idx = notesCache.findIndex(n => n.id === noteId);
     
     if (idx !== -1)
@@ -192,7 +198,13 @@ function saveEdit()
     entry_post.children[1].style.border = "none";
     entry_post.children[2].style.border = "none";
     //display the edit once again
-    editBtn.onclick();
+    const editBtn = entry_post.querySelector('#editButton');
+    
+    if(editBtn)
+    {
+        editBtn.innerText = 'Edit';
+    }
+
 }
 
 function addPost() {
