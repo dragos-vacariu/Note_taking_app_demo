@@ -155,8 +155,8 @@ function saveEdit()
 {
     const entry_post = this.closest('.jour_entry');
     const noteId = entry_post.dataset.id;
-    const title = entry_post.children[1].innerText;
-    const content = entry_post.children[2].innerText;
+    const title = entry_post.children[1].innerHtml;
+    const content = entry_post.children[2].innerHtml;
 
     const idx = notesCache.findIndex(n => n.id === noteId);
     
