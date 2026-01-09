@@ -134,12 +134,14 @@ function addNoteToUI(title, content, id, edit_mode=false)
     titleDiv.className = 'jour_entry_title';
     titleDiv.innerHTML = title;
     titleDiv.contentEditable = false;
+    titleDiv.addEventListener("keydown", (e) => { textFormatting_KeyboardShortcuts(e)});
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'jour_entry_content';
     contentDiv.innerHTML = content;
     contentDiv.contentEditable = false;
-
+    contentDiv.addEventListener("keydown", (e) => { textFormatting_KeyboardShortcuts(e)});
+    
     entryDiv.appendChild(dropdownDiv);
     entryDiv.appendChild(titleDiv);
     entryDiv.appendChild(contentDiv);
@@ -151,6 +153,27 @@ function addNoteToUI(title, content, id, edit_mode=false)
     {
         editBtn.onclick();
     }
+}
+
+function textFormatting_KeyboardShortcuts(e)
+{
+        const editableDiv = e.target; // this is the element that triggered the event
+        
+        if (editableDiv.contentEditable == true)
+        {
+            if (e.ctrlKey && e.key === "h" ) { // Ctrl+H for highlight
+                e.preventDefault();
+                document.execCommand("hiliteColor", false, "yellow");
+            }
+            if (e.ctrlKey && e.key === "l") { // Ctrl+L for bullet list
+                e.preventDefault();
+                document.execCommand("insertUnorderedList");
+            }
+            if (e.ctrlKey && e.key === "s") { // Ctrl+S for strikethrough
+                e.preventDefault();
+                document.execCommand("strikeThrough");
+            }
+        }
 }
 
 // ------------------------
