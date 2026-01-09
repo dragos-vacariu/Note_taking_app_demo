@@ -134,13 +134,13 @@ function addNoteToUI(title, content, id, edit_mode=false)
     titleDiv.className = 'jour_entry_title';
     titleDiv.innerHTML = title;
     titleDiv.contentEditable = false;
-    titleDiv.addEventListener("keydown", (e) => { textFormatting_KeyboardShortcuts(e)});
+    //titleDiv.addEventListener("keydown", (e) => { textFormatting_KeyboardShortcuts(e)});
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'jour_entry_content';
     contentDiv.innerHTML = content;
     contentDiv.contentEditable = false;
-    contentDiv.addEventListener("keydown", (e) => { textFormatting_KeyboardShortcuts(e)});
+    //contentDiv.addEventListener("keydown", (e) => { textFormatting_KeyboardShortcuts(e)});
     
     entryDiv.appendChild(dropdownDiv);
     entryDiv.appendChild(titleDiv);
@@ -161,15 +161,15 @@ function textFormatting_KeyboardShortcuts(e)
         
         if (editableDiv.contentEditable == true)
         {
-            if (e.ctrlKey && e.key === "," ) { // Ctrl+H for highlight
+            if (e.ctrlKey && e.key === "," ) { // Ctrl+, for highlight
                 e.preventDefault();
                 document.execCommand("hiliteColor", false, "yellow");
             }
-            if (e.ctrlKey && e.key === ".") { // Ctrl+L for bullet list
+            if (e.ctrlKey && e.key === ".") { // Ctrl+. for bullet list
                 e.preventDefault();
                 document.execCommand("insertUnorderedList");
             }
-            if (e.ctrlKey && e.key === ";") { // Ctrl+S for strikethrough
+            if (e.ctrlKey && e.key === ";") { // Ctrl+; for strikethrough
                 e.preventDefault();
                 document.execCommand("strikeThrough");
             }
