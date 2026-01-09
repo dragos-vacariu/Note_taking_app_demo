@@ -157,7 +157,8 @@ function saveEdit()
     const noteId = entry_post.dataset.id;
     const title = entry_post.children[1].innerHtml;
     const content = entry_post.children[2].innerHtml;
-
+    console.log("TITLE: " + title);
+    console.log("CONTENT: " + content);
     const idx = notesCache.findIndex(n => n.id === noteId);
     
     if (idx !== -1)
