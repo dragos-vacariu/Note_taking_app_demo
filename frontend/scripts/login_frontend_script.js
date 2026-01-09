@@ -291,10 +291,51 @@ function showResendVerification(user_email)
 async function LogIn_AsGuest()
 {
     const messageDiv = document.getElementById('message');
+    const extraOptions = document.getElementById('extraOptions');
     document.querySelector('input[name="password"]').removeAttribute('required');
     document.querySelector('input[name="email_address"]').removeAttribute('required');
+    document.querySelector('input[name="password"]').required = true;
+    document.querySelector('input[name="email_address"]').required = true;
 
     let mode = 'login'; // default mode
+    
+    //===========================
+    //Helper function to render checkbox dynamically
+    //===========================
+    function renderExtraOptions() 
+    {
+        extraOptions.innerHTML = '';
+        
+        if (mode === 'login') 
+        {
+            //Creating 'Keep me logged in' form
+            const ul = document.createElement('ul');
+            ul.id = "keep_me_logged_in_ul";
+            
+            const li_label = document.createElement('li');
+            li_label.innerHTML = "<span>Keep me logged in:</span>";
+            ul.appendChild(li_label);
+            
+            const li_checkbox = document.createElement('li');
+            li_checkbox.innerHTML = `<input type="checkbox" id="rememberMe" name="rememberMe" />`
+            ul.appendChild(li_checkbox);
+            
+            //Appending 'Keep me logged in' form
+            extraOptions.appendChild(ul);
+            
+            //Create a forgot password link
+            const li_forgotPasswordLink = document.createElement('li');
+            
+            li_forgotPasswordLink.innerHTML = `<a id="forgotPasswordLink" href="#">Forgot Password?</a>`
+            
+            //Append the forgot password link element to extraOptions form.
+            extraOptions.appendChild(li_forgotPasswordLink);
+        }
+    }
+
+    //Initial render for login mode
+    renderExtraOptions();
+    
     
     const user_email = "guest@admin_drva_apps.com";
     const password = "demoLMI09238#!";
