@@ -44,7 +44,7 @@
         --site-title-font: normal bold 0.8rem/1.2 FjallaOne, serif;
         --user-logged-font: normal normal 0.8rem/1.2 FjallaOne, serif;
         --nav-font: normal bold 0.8rem/1.4 FjallaOne, serif;
-        --button-font: normal bold 0.8/1 Calibri, serif;
+        --button-font: normal bold 0.8rem/1 Calibri, serif;
         --login-labels-font: normal normal 0.8rem/1.2 Calibri, serif;
         
         --post-title-font: italic bold 1.1rem/1.2 Calibri, serif;
@@ -163,7 +163,7 @@ h3{
 
 
 button{
-    padding: 1vw;
+    padding: 8px;
     border: none;
     border-radius: 6px;
     background-color: var(--blue-color);
@@ -172,8 +172,23 @@ button{
     cursor: pointer;
 }
 
+@media (max-width: 768px) 
+{
+    button{
+        padding: 7px;
+    }
+}
+
+@media (max-width: 480px) 
+{
+    button{
+        padding: 5px;
+    }
+}
+
 #menu button{
     margin: 5px;
+    font: var(--button-font);
 }
 
 button:hover {
