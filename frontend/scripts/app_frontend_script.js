@@ -116,7 +116,6 @@ function addNoteToUI(title, content, id, edit_mode=false)
     const editBtn = document.createElement('a');
     editBtn.innerText = 'Edit';
     editBtn.href = '#';
-    editBtn.id = 'editButton';
 
     editBtn.onclick = function() {
         toggleEdit.call(this); 
@@ -178,7 +177,7 @@ function saveEdit()
         notesCache.push({ id: noteId, title, content });
     }
 
-    fetch(API_URL + '/api/backend_api_manager_for_github', {
+    fetch('/api/backend_api_manager', {
         method: 'POST',
         headers: authHeaders(),
         
@@ -197,14 +196,13 @@ function saveEdit()
     entry_post.children[2].contentEditable = "false";
     entry_post.children[1].style.border = "none";
     entry_post.children[2].style.border = "none";
-    //display the edit once again
-    const editBtn = entry_post.querySelector('#editButton');
     
-    if(editBtn)
+    //display the edit once again
+    const toggleDropdownButton = entry_post.querySelector('#dropbtn');
+    if(toggleDropdownButton)
     {
-        editBtn.innerText = 'Edit';
+        toggleDropdownButton.innerText = '...';
     }
-
 }
 
 function addPost() {
