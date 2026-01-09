@@ -84,7 +84,7 @@ function LogIn_SignUp()
             mode === 'login' ? 'Switch to Sign Up' : 'Switch to Login';
         
         messageDiv.innerText = '';
-        renderExtraOptions();
+        renderExtraOptions(mode);
     });
     
     //===========================
@@ -298,8 +298,6 @@ async function LogIn_AsGuest()
 
     document.querySelector('input[name="password"]').removeAttribute('required');
     document.querySelector('input[name="email_address"]').removeAttribute('required');
-    document.querySelector('input[name="password"]').required = true;
-    document.querySelector('input[name="email_address"]').required = true;
     
     
     const user_email = "guest@admin_drva_apps.com";

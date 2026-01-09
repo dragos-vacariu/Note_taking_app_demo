@@ -178,7 +178,7 @@ function saveEdit()
         notesCache.push({ id: noteId, title, content });
     }
 
-    fetch('/api/backend_api_manager', {
+    fetch(API_URL + '/api/backend_api_manager_for_github', {
         method: 'POST',
         headers: authHeaders(),
         
