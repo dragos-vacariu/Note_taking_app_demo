@@ -87,7 +87,7 @@
 }
 
 .app-nav .selected_link{
-    color: var(--darkred-color);
+    color: var(--darkred-color) !important;
     border-bottom: solid 2px var(--darkred-color);
 }
 
