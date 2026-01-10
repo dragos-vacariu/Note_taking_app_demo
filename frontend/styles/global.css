@@ -75,10 +75,10 @@
 }
 
 .app-nav a {
-  color: var(--blue-color);
-  text-decoration: none;
-  font-weight: normal;
-  letter-spacing: 0.2px;
+  color: var(--blue-color) !important;
+  text-decoration: none !important;
+  font-weight: normal !important;
+  letter-spacing: 0.2px !important;
 }
 
 .app-nav a + a {
@@ -88,7 +88,7 @@
 
 .app-nav .selected_link{
     color: var(--darkred-color) !important;
-    border-bottom: solid 2px var(--darkred-color);
+    border-bottom: solid 2px var(--darkred-color) !important;
 }
 
 .app-nav a:hover {
