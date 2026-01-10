@@ -28,8 +28,15 @@ function toggleEdit() {
     const entry_post = this.closest('.jour_entry');
 
     // Enable editing
-    entry_post.children[0].children[0].textContent = "Post";
-    entry_post.children[0].children[0].onclick = saveEdit;
+    const toggleDropdownButton = entry_post.querySelector('#dropbtn');
+    
+    if(toggleDropdownButton)
+    {
+        toggleDropdownButton.textContent = "Post";
+        toggleDropdownButton.onclick = saveEdit;
+    }
+    
+    
     entry_post.children[1].contentEditable = "true";
     entry_post.children[2].contentEditable = "true";
     entry_post.children[1].style.border = enabledEditableDivBorderStyle;
@@ -203,6 +210,9 @@ function saveEdit()
     if(toggleDropdownButton)
     {
         toggleDropdownButton.innerText = '...';
+        toggleDropdownButton.onclick = function() {
+            toggleDropdown(this); 
+        };
     }
 
 }
