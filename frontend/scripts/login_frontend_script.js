@@ -1,6 +1,8 @@
 let domain = "GitHub";
 var API_URL = "";
 
+let mode = 'login'; // default mode
+
 if(domain.toLowerCase() == "github")
 {
     API_URL = "https://dragos-vacariu-note-taking.vercel.app";
@@ -64,8 +66,6 @@ function LogIn_SignUp()
     document.querySelector('input[name="email_address"]').setAttribute('required', '');
     document.querySelector('input[name="password"]').required = true;
     document.querySelector('input[name="email_address"]').required = true;
-
-    let mode = 'login'; // default mode
     
     //Initial render for login mode
     renderExtraOptions(mode);
@@ -185,7 +185,7 @@ function LogIn_SignUp()
     });
 }
 
-function toggleLoginSignup(mode="login")
+function toggleLoginSignup()
 {
     const form = document.getElementById('authForm');
     mode = mode === 'login' ? 'signup' : 'login';
@@ -203,7 +203,7 @@ function toggleLoginSignup(mode="login")
 //===========================
 //Helper function to render checkbox dynamically
 //===========================
-function renderExtraOptions(mode="login") 
+function renderExtraOptions() 
 {
     const extraOptions = document.getElementById('extraOptions');
     extraOptions.innerHTML = '';
