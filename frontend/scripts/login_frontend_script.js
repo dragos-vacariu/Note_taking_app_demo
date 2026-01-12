@@ -193,10 +193,10 @@ function toggleLoginSignup(mode="login")
     form.querySelector('button[type="submit"]').innerText =
         mode === 'login' ? 'Login' : 'Sign Up';
     
-    toggleBtn.innerText =
+    document.getElementById("toggleMode").innerText =
         mode === 'login' ? 'Switch to Sign Up' : 'Switch to Login';
     
-    messageDiv.innerText = '';
+    document.getElementById('message').innerText = '';
     renderExtraOptions(mode);
 }
 
