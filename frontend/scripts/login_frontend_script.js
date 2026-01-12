@@ -187,6 +187,7 @@ function LogIn_SignUp()
 
 function toggleLoginSignup(mode="login")
 {
+    const form = document.getElementById('authForm');
     mode = mode === 'login' ? 'signup' : 'login';
     
     form.querySelector('button[type="submit"]').innerText =
