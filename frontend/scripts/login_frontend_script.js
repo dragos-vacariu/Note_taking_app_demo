@@ -58,7 +58,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 function LogIn_SignUp()
 {
     const form = document.getElementById('authForm');
-    const toggleBtn = document.getElementById('toggleMode');
     const messageDiv = document.getElementById('message');
     
     document.querySelector('input[name="password"]').setAttribute('required', '');
@@ -70,22 +69,6 @@ function LogIn_SignUp()
     
     //Initial render for login mode
     renderExtraOptions(mode);
-    
-    //===========================
-    //Toggle login/signup mode
-    //===========================
-    toggleBtn.addEventListener('click', () => {
-        mode = mode === 'login' ? 'signup' : 'login';
-        
-        form.querySelector('button[type="submit"]').innerText =
-            mode === 'login' ? 'Login' : 'Sign Up';
-        
-        toggleBtn.innerText =
-            mode === 'login' ? 'Switch to Sign Up' : 'Switch to Login';
-        
-        messageDiv.innerText = '';
-        renderExtraOptions(mode);
-    });
     
     //===========================
     // Handle form submission
@@ -200,6 +183,20 @@ function LogIn_SignUp()
             submitBtn.disabled = false;
         }
     });
+}
+
+function toggleLoginSignup(mode="login")
+{
+    mode = mode === 'login' ? 'signup' : 'login';
+    
+    form.querySelector('button[type="submit"]').innerText =
+        mode === 'login' ? 'Login' : 'Sign Up';
+    
+    toggleBtn.innerText =
+        mode === 'login' ? 'Switch to Sign Up' : 'Switch to Login';
+    
+    messageDiv.innerText = '';
+    renderExtraOptions(mode);
 }
 
 //===========================
@@ -383,3 +380,4 @@ async function LogIn_AsGuest()
 
 document.getElementById("login_sigup").onclick = LogIn_SignUp;
 document.getElementById("login_as_guest_button").onclick = LogIn_AsGuest;
+document.getElementById("toggleMode").addEventListener('click', () => toggleLoginSignup());
