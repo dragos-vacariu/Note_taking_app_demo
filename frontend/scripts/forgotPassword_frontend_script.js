@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try
         {
-            const res = await fetch(API_URL + '/api/' + API_SCRIPT,, {
+            const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 
