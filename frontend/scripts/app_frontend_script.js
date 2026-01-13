@@ -11,10 +11,22 @@ window.onload = async function() {
         return;
     }
     // Show logged user info
-    showLoggedUser();
+    await showLoggedUser();
 
     // Load notes from backend
     loadNotes();
+    
+    //Get the addEntry button
+    const addEntryButton = document.getElementById("add_entry_button");
+    
+    if(addEntryButton)
+    {
+         //Adding async function for button onclick 
+        addEntryButton.addEventListener("click" , async () => {
+            await addPost();
+            // You can add more code here to run after addPost() finishes
+        });
+    }
 };
 
 // ---------------------------------------------------------
@@ -81,9 +93,6 @@ function toggleDropdown(button)
 // ---------------------------------------------------------
 function loadNotes()
 {
-    // Show logged user info
-    showLoggedUser();
-
     fetch(API_URL + '/api/' + API_SCRIPT, {
         method: 'POST',
         headers: authHeaders(),
@@ -120,7 +129,7 @@ function loadNotes()
 // ---------------------------------------------------------
 // Function used to add a Note to the UI/Web Page
 // ---------------------------------------------------------
-function addNoteToUI(title, content, id, edit_mode=false) 
+async function addNoteToUI(title, content, id, edit_mode=false) 
 {
     //CREATING A POST
     const entryDiv = document.createElement('div');
@@ -175,14 +184,27 @@ function addNoteToUI(title, content, id, edit_mode=false)
     //ADDING THE DATA TO THE POST
     const titleDiv = document.createElement('div');
     titleDiv.id = 'jour_entry_title';
-    titleDiv.innerHTML = title;
-    //titleDiv.innerHTML = decryptData(MEK, title);
+    if(edit_mode==false)
+    {
+        titleDiv.innerHTML = await decryptData(MEK, title);
+    }
+    else
+    {
+        titleDiv.innerHTML = title;
+    }
     titleDiv.contentEditable = false;
 
     const contentDiv = document.createElement('div');
     contentDiv.id = 'jour_entry_content';
-    //contentDiv.innerHTML = decryptData(MEK, content);
-    contentDiv.innerHTML = content;
+    
+    if(edit_mode==false)
+    {
+        contentDiv.innerHTML = await decryptData(MEK, content);
+    }
+    else
+    {
+        contentDiv.innerHTML = content;
+    }
     contentDiv.contentEditable = false;
     
     // simulate "5 rows"
@@ -334,9 +356,6 @@ async function saveEdit(e)
         
     if(titleDiv && contentDiv)
     {
-        //titleDiv.contentEditable = "true";
-        //titleDiv.style.border = enabledEditableDivBorderStyle;;
-        
         /*Remove formatting for the post title*/
         titleDiv.innerHTML = titleDiv.innerText;
         
@@ -345,8 +364,6 @@ async function saveEdit(e)
         //Encrypting data:
         const encryptedTitle = await encryptData(MEK, title);
         
-        //contentDiv.contentEditable = "true";
-        //contentDiv.style.border = enabledEditableDivBorderStyle;
         const content = contentDiv.innerHTML;
         
         //Encrypting data:
@@ -412,11 +429,11 @@ async function saveEdit(e)
 // ---------------------------------------------------------
 // Function that triggers when the AddPost button is clicked
 // ---------------------------------------------------------
-function addPost() {
+async function addPost() {
     const newId = 'note-' + Date.now();
     const newNote = { id: newId, title: "New Note", content: "Add your content here..." };
     notesCache.push(newNote);
-    addNoteToUI(newNote.title, newNote.content, newNote.id, true);
+    await addNoteToUI(newNote.title, newNote.content, newNote.id, true);
 }
 
 // ---------------------------------------------------------
@@ -454,9 +471,9 @@ function remove_entry() {
 // ---------------------------------------------------------
 // Show logged_user session
 // ---------------------------------------------------------
-function showLoggedUser()
+async function showLoggedUser()
 {
-    const payload = requireLogin(); // ensures user is logged in
+    const payload = await requireLogin(); // ensures user is logged in
     const userInfo = document.getElementById('user_logged');
 
     const userEmail = payload.user_email || payload.username;

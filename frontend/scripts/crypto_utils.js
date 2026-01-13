@@ -97,7 +97,7 @@ async function importMEKKey(rawKey)
 // -------------------------------------------------------------------------------
 // Function used to encrypt data before sending it to the server
 // -------------------------------------------------------------------------------
-async function encryptData(plainText, cryptoKey)
+async function encryptData(cryptoKey, plainText)
 {
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const encoded = new TextEncoder().encode(plainText);
@@ -116,7 +116,7 @@ async function encryptData(plainText, cryptoKey)
 // -------------------------------------------------------------------------------
 // Function used to decrypt data received from the server
 // -------------------------------------------------------------------------------
-async function decryptData(encryptedObj, cryptoKey)
+async function decryptData(cryptoKey, encryptedObj)
 {
     const iv = new Uint8Array(encryptedObj.iv);
     const ciphertext = new Uint8Array(encryptedObj.data);

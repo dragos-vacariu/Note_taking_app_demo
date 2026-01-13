@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const payload = requireLogin(); // local JWT validation
+    const payload = await requireLogin(); // local JWT validation
     
     if (!payload)
     {
