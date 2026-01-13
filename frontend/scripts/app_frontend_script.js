@@ -1,20 +1,15 @@
 const enabledEditableDivBorderStyle = "inset 1px rgba(0,0,0,0.5)";
-let notesCache = []; // Cache for notes loaded from backend
 
-window.onload = async function() {
-    // Ensure user is logged in; redirects to login if not
-    const user = await requireLogin();
+window.onload = async function() 
+{
+    // Load notes from backend
+    await loadNotes();
     
-    if (!user) 
-    {
-        window.location.href = APP_LOCATION + '/frontend/login.html';
-        return;
-    }
     // Show logged user info
     await showLoggedUser();
-
+    
     // Load notes from backend
-    loadNotes();
+    await displayNotes();
     
     //Get the addEntry button
     const addEntryButton = document.getElementById("add_entry_button");
@@ -28,6 +23,18 @@ window.onload = async function() {
         });
     }
 };
+
+// ---------------------------------------------------------
+// Function displaying the Notes/Posts on the UI
+// ---------------------------------------------------------
+async function displayNotes()
+{   
+    console.log(NOTES_CACHE);
+    for (const note of NOTES_CACHE)
+    {
+        await addNoteToUI(note.title, note.content, note.id);
+    }
+}
 
 // ---------------------------------------------------------
 // Function triggered when the Edit option is clicked from the 
@@ -88,45 +95,6 @@ function toggleDropdown(button)
 }
 
 // ---------------------------------------------------------
-// Function used to connect to the server and receive all 
-// the Posts/Notes
-// ---------------------------------------------------------
-function loadNotes()
-{
-    fetch(API_URL + '/api/' + API_SCRIPT, {
-        method: 'POST',
-        headers: authHeaders(),
-        
-        //HTTP can only send strings through web... JSON.stringify my content
-        body: JSON.stringify({
-            method_name: 'getUserNotes',
-            method_params: {}
-        })
-    })//no ; means the following .then/.catch will wait for the server response before executing
-        .then(async res => {
-            if (!res.ok) {
-                if (res.status === 401) {
-                    alert('Session expired. Please log in again.');
-                    logoutUser();
-                    return;
-                }
-                throw new Error('Failed to load notes');
-            }
-            return res.json();
-        })
-        .then(data => {
-            if (!data) return;
-
-            notesCache = data.notes || [];
-            data.notes.forEach(note => addNoteToUI(note.title, note.content, note.id));
-        })
-        .catch(err => {
-            console.error('Failed to load notes:', err);
-            alert('Failed to load notes');
-        });
-}
-
-// ---------------------------------------------------------
 // Function used to add a Note to the UI/Web Page
 // ---------------------------------------------------------
 async function addNoteToUI(title, content, id, edit_mode=false) 
@@ -184,27 +152,13 @@ async function addNoteToUI(title, content, id, edit_mode=false)
     //ADDING THE DATA TO THE POST
     const titleDiv = document.createElement('div');
     titleDiv.id = 'jour_entry_title';
-    if(edit_mode==false)
-    {
-        titleDiv.innerHTML = await decryptData(MEK, title);
-    }
-    else
-    {
-        titleDiv.innerHTML = title;
-    }
+    titleDiv.innerHTML = title;
     titleDiv.contentEditable = false;
 
     const contentDiv = document.createElement('div');
     contentDiv.id = 'jour_entry_content';
     
-    if(edit_mode==false)
-    {
-        contentDiv.innerHTML = await decryptData(MEK, content);
-    }
-    else
-    {
-        contentDiv.innerHTML = content;
-    }
+    contentDiv.innerHTML = content;
     contentDiv.contentEditable = false;
     
     // simulate "5 rows"
@@ -370,17 +324,17 @@ async function saveEdit(e)
         const encryptedContent = await encryptData(MEK, content);
         console.log(MEK)
         
-        const idx = notesCache.findIndex(n => n.id === noteId);
+        const idx = NOTES_CACHE.findIndex(n => n.id === noteId);
     
         if (idx !== -1)
         {
-            notesCache[idx].title = encryptedTitle;
-            notesCache[idx].content = encryptedContent;
+            NOTES_CACHE[idx].title = encryptedTitle;
+            NOTES_CACHE[idx].content = encryptedContent;
         }
         
         else
         {
-            notesCache.push({ id: noteId, title, content });
+            NOTES_CACHE.push({ id: noteId, title: title, content: content });
         }
 
         fetch(API_URL + '/api/' + API_SCRIPT, {
@@ -389,7 +343,7 @@ async function saveEdit(e)
             
             //HTTP can only send strings through web... JSON.stringify my content
             body: JSON.stringify({
-                notes: notesCache,
+                notes: NOTES_CACHE,
                 method_name: 'saveUserNotes',
                 method_params: {}
             })
@@ -432,7 +386,7 @@ async function saveEdit(e)
 async function addPost() {
     const newId = 'note-' + Date.now();
     const newNote = { id: newId, title: "New Note", content: "Add your content here..." };
-    notesCache.push(newNote);
+    NOTES_CACHE.push(newNote);
     await addNoteToUI(newNote.title, newNote.content, newNote.id, true);
 }
 
@@ -443,8 +397,8 @@ function remove_entry() {
     const entryDiv = this.closest('.jour_entry');
     const noteId = entryDiv.dataset.id;
 
-    const idx = notesCache.findIndex(n => n.id === noteId);
-    if (idx !== -1) notesCache.splice(idx, 1);
+    const idx = NOTES_CACHE.findIndex(n => n.id === noteId);
+    if (idx !== -1) NOTES_CACHE.splice(idx, 1);
 
     fetch(API_URL + '/api/' + API_SCRIPT, {
         method: 'POST',
@@ -452,7 +406,7 @@ function remove_entry() {
         
         //HTTP can only send strings through web... JSON.stringify my content
         body: JSON.stringify({
-            notes: notesCache,
+            notes: NOTES_CACHE,
             method_name: 'saveUserNotes',
             method_params: {}
         })

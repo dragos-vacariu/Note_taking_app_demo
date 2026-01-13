@@ -4,6 +4,7 @@ var API_URL = "";
 var API_SCRIPT = "backend_api_manager";
 var MEK = ""; /*Master Encryption Key (MEK) that will actually be used for encrypting and decrypting your data.*/
 var APP_LOCATION = "";
+var NOTES_CACHE = []; // Cache for notes loaded from backend
 
 /*
 var variable have global scope (and can be used in external files).
@@ -174,4 +175,64 @@ async function loadMEK()
         false,
         ["encrypt", "decrypt"]
     );
+}
+
+async function loadNotes()
+{
+    const user = await requireLogin();
+
+    if (!user)
+    {
+        window.location.href = APP_LOCATION + '/frontend/login.html';
+        return;
+    }
+
+    try
+    {
+        const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({
+                method_name: 'getUserNotes',
+                method_params: {}
+            })
+        });
+
+        if (!res.ok)
+        {
+            if (res.status === 401)
+            {
+                alert('Session expired. Please log in again.');
+                logoutUser();
+                return;
+            }
+            throw new Error('Failed to load notes');
+        }
+
+        const data = await res.json();
+        if (!data || !data.notes)
+        {
+            return;
+        }
+        NOTES_CACHE = [];
+
+        for (const note of data.notes)
+        {
+            // Use await properly inside an async function
+            let decryptedTitle = await decryptData(MEK, note.title);
+            let decryptedContent = await decryptData(MEK, note.content);
+            
+            NOTES_CACHE.push({ id: note.id, title: decryptedTitle, content: decryptedContent });
+        }
+
+        console.log("Notes read: ", NOTES_CACHE);
+        // Optionally: render notes to UI
+        // NOTES_CACHE.forEach(note => addNoteToUI(note.decryptedTitle, note.decryptedContent, note.id));
+
+    }
+    catch (err)
+    {
+        console.error('Failed to load notes:', err);
+        alert('Failed to load notes');
+    }
 }
