@@ -1,11 +1,5 @@
-let platform = "GitHub";
-var API_URL = "";
-
-if(platform.toLowerCase() == "github")
-{
-    API_URL = "https://dragos-vacariu-note-taking.vercel.app";
-}
-
+/*Importing global variables from the external module*/
+import { PLATFORM, API_URL, API_SCRIPT, MEK, APP_LOCATION } from './auth_frontend_script.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const payload = requireLogin(); // local JWT validation
@@ -33,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try
         {
             const token = getToken();
-            const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
+            const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
                 method: 'POST',
                 headers: authHeaders(),
                 
@@ -72,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const token = getToken();
-            const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
+            const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
                 method: 'POST',
                 headers: authHeaders(),
                 

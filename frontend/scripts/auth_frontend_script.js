@@ -1,8 +1,9 @@
 // global variable
-var PLATFORM = location.href.startsWith("https://dragos-vacariu.github.io") ? "GitHub" : "";
-var API_URL = "";
-var API_SCRIPT = "backend_api_manager";
-var MEK;
+export var PLATFORM = location.href.startsWith("https://dragos-vacariu.github.io") ? "GitHub" : "";
+export var API_URL = "";
+export var API_SCRIPT = "backend_api_manager";
+export var MEK = "";
+export var APP_LOCATION = "";
 
 /*
 var variable have global scope (and can be used in external files).
@@ -12,6 +13,7 @@ let variable have global scope ONLY in the file in which is declared.
 if(PLATFORM.toLowerCase() == "github")
 {
     API_URL = "https://dragos-vacariu-note-taking.vercel.app";
+    APP_LOCATION = "https://dragos-vacariu.github.io/Note_taking_app_demo";
     API_SCRIPT = "backend_api_manager_for_github";
 }
 

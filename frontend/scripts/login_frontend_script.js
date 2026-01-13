@@ -1,3 +1,6 @@
+/*Importing global variables from the external module*/
+import { PLATFORM, API_URL, API_SCRIPT, MEK, APP_LOCATION } from './auth_frontend_script.js';
+
 let mode = 'login'; // default mode
 
 if(PLATFORM.toLowerCase() == "github")
@@ -34,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (res.ok) 
             {
                 // Token is valid, redirect user to app
-                window.location.href = 'https://dragos-vacariu.github.io/Note_taking_app_demo/frontend/app.html';
+                window.location.href = APP_LOCATION + '/frontend/app.html';
                 return; // stop execution
             }
             else 
@@ -281,7 +284,7 @@ function LogIn_SignUp()
                 {
                     messageDiv.innerText = 'Login successful! Redirecting...';
                     setTimeout(() => {
-                        window.location.href = '/frontend/app.html';
+                        window.location.href = APP_LOCATION + '/frontend/app.html';
                     }, 1000);
                 }
             }
@@ -371,7 +374,7 @@ async function LogIn_AsGuest()
 
             messageDiv.innerText = 'Login successful! Redirecting...';
             setTimeout(() => {
-                window.location.href = 'https://dragos-vacariu.github.io/Note_taking_app_demo/frontend/app.html';
+                window.location.href = APP_LOCATION + '/frontend/app.html';
             }, 1000);
         }
         else

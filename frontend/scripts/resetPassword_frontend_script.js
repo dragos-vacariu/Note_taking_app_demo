@@ -1,10 +1,5 @@
-let platform = "GitHub";
-var API_URL = "";
-
-if(platform.toLowerCase() == "github")
-{
-    API_URL = "https://dragos-vacariu-note-taking.vercel.app";
-}
+/*Importing global variables from the external module*/
+import { PLATFORM, API_URL, API_SCRIPT, MEK, APP_LOCATION } from './auth_frontend_script.js';
 
 document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
     
@@ -32,7 +27,7 @@ document.getElementById('changePasswordForm').addEventListener('submit', async (
     }
 
     try {
-        const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
+        const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             
@@ -49,7 +44,10 @@ document.getElementById('changePasswordForm').addEventListener('submit', async (
         messageDiv.textContent = data.message;
         messageDiv.className = data.success ? 'success' : 'error';
 
-        if(data.success) setTimeout(() => window.location.href='/frontend/login.html', 2000);
+        if(data.success)
+        {
+            setTimeout(() => window.location.href = APP_LOCATION + '/frontend/login.html', 2000);
+        }
     }
     
     catch(err)

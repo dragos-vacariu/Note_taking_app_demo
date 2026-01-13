@@ -1,11 +1,5 @@
-let platform = "GitHub";
-var API_URL = "";
-
-if(platform.toLowerCase() == "github")
-{
-    API_URL = "https://dragos-vacariu-note-taking.vercel.app";
-}
-
+/*Importing global variables from the external module*/
+import { PLATFORM, API_URL, API_SCRIPT, MEK, APP_LOCATION } from './auth_frontend_script.js';
 
 // Top-level variables accessible to both functions
 const messageEl = document.querySelector('.message');
@@ -41,7 +35,7 @@ async function verifyEmail(token)
     try {
         //const res = await fetch(`/api/verifyEmail_backend?token=${token}`);
         
-        const res = await fetch(`${API_URL}/api/backend_api_manager_for_github?token=${token}`, {
+        const res = await fetch(`/api/backend_api_manager?token=${token}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 
@@ -60,7 +54,7 @@ async function verifyEmail(token)
             messageEl.classList.add('success');
 
             setTimeout(() => {
-                window.location.href = '/frontend/login.html';
+                window.location.href = APP_LOCATION + '/frontend/login.html';
             }, 3000);
         }
         
@@ -95,7 +89,7 @@ async function resendBtnFunction(e)
 
     try
     {
-        const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
+        const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 
