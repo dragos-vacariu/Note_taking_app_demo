@@ -145,7 +145,9 @@ async function addNoteToUI(title, content, id, edit_mode=false)
     const removeBtn = document.createElement('a');
     removeBtn.innerText = 'Remove';
     removeBtn.href = '#';
-    removeBtn.onclick = remove_entry;
+    removeBtn.onclick = async (e) =>  {
+        await remove_entry(e);
+    };
     dropdownContentDiv.appendChild(removeBtn);
     
     //============================================================
@@ -314,36 +316,33 @@ async function saveEdit(e)
         titleDiv.innerHTML = titleDiv.innerText;
         
         const title = titleDiv.innerHTML;
-        
-        //Encrypting data:
-        const encryptedTitle = await encryptData(MEK, title);
-        
         const content = contentDiv.innerHTML;
         
         //Encrypting data:
-        const encryptedContent = await encryptData(MEK, content);
         console.log(MEK)
         
         const idx = NOTES_CACHE.findIndex(n => n.id === noteId);
     
         if (idx !== -1)
         {
-            NOTES_CACHE[idx].title = encryptedTitle;
-            NOTES_CACHE[idx].content = encryptedContent;
+            NOTES_CACHE[idx].title = title;
+            NOTES_CACHE[idx].content = content;
         }
         
         else
         {
             NOTES_CACHE.push({ id: noteId, title: title, content: content });
         }
-
+        
+        const encryptedNotes = await getEncryptedNotes();
+        
         fetch(API_URL + '/api/' + API_SCRIPT, {
             method: 'POST',
             headers: authHeaders(),
             
             //HTTP can only send strings through web... JSON.stringify my content
             body: JSON.stringify({
-                notes: NOTES_CACHE,
+                notes: encryptedNotes,
                 method_name: 'saveUserNotes',
                 method_params: {}
             })
@@ -393,20 +392,23 @@ async function addPost() {
 // ---------------------------------------------------------
 // Function to remove note/post
 // ---------------------------------------------------------
-function remove_entry() {
-    const entryDiv = this.closest('.jour_entry');
+async function remove_entry(e)
+{
+    const entryDiv = e.currentTarget.closest('.jour_entry');
     const noteId = entryDiv.dataset.id;
 
     const idx = NOTES_CACHE.findIndex(n => n.id === noteId);
     if (idx !== -1) NOTES_CACHE.splice(idx, 1);
-
+    
+    const encryptedNotes = await getEncryptedNotes();
+    
     fetch(API_URL + '/api/' + API_SCRIPT, {
         method: 'POST',
         headers: authHeaders(),
         
         //HTTP can only send strings through web... JSON.stringify my content
         body: JSON.stringify({
-            notes: NOTES_CACHE,
+            notes: encryptedNotes,
             method_name: 'saveUserNotes',
             method_params: {}
         })
@@ -420,6 +422,19 @@ function remove_entry() {
         .catch(() => {
             alert('Failed to remove note')
         });
+}
+
+async function getEncryptedNotes()
+{
+    let encrypted_notes = [];
+    
+    for (note of NOTES_CACHE)
+    {
+        const encryptedTitle = await encryptData(MEK, note.title);
+        const encryptedContent = await encryptData(MEK, note.content);
+        encrypted_notes.push( {id: note.id, title: encryptedTitle, content: encryptedContent} );
+    }
+    return encrypted_notes;
 }
 
 // ---------------------------------------------------------

@@ -11,9 +11,10 @@ if(PLATFORM.toLowerCase() == "github")
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
+    loadMEK();
     
     //Checking if user is already authenticated
-    if (token) 
+    if (token && MEK) 
     {
         try {
             // Validate token with backend

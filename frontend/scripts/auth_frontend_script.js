@@ -219,7 +219,9 @@ async function loadNotes()
         for (const note of data.notes)
         {
             // Use await properly inside an async function
+            console.log("Decrypting Title: " + note.title);
             let decryptedTitle = await decryptData(MEK, note.title);
+            console.log("Decrypting Content: " + note.content);
             let decryptedContent = await decryptData(MEK, note.content);
             
             NOTES_CACHE.push({ id: note.id, title: decryptedTitle, content: decryptedContent });
