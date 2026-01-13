@@ -1,8 +1,13 @@
 // global variable
-let PLATFORM = location.href.startsWith("https://dragos-vacariu.github.io") ? "GitHub" : "";
-let API_URL = "";
-let API_SCRIPT = "backend_api_manager";
-let MEK;
+var PLATFORM = location.href.startsWith("https://dragos-vacariu.github.io") ? "GitHub" : "";
+var API_URL = "";
+var API_SCRIPT = "backend_api_manager";
+var MEK;
+
+/*
+var variable have global scope (and can be used in external files).
+let variable have global scope ONLY in the file in which is declared.
+*/
 
 if(PLATFORM.toLowerCase() == "github")
 {
