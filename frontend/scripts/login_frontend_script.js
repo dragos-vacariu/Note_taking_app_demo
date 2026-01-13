@@ -110,8 +110,8 @@ function renderExtraOptions()
         //Create a forgot password link
         const li_forgotPasswordLink = document.createElement('li');
         
-        li_forgotPasswordLink.innerHTML = `<a id="forgotPasswordLink" href="#">Forgot Password?</a>`
-        
+        li_forgotPasswordLink.innerHTML = `<a id="forgotPasswordLink" href="./forgotPassword.html">Forgot Password?</a>`
+
         //Append the forgot password link element to extraOptions form.
         extraOptions.appendChild(li_forgotPasswordLink);
     }
