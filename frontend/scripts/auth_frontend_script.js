@@ -2,7 +2,7 @@
 var PLATFORM = location.href.startsWith("https://dragos-vacariu.github.io") ? "GitHub" : "";
 var API_URL = "";
 var API_SCRIPT = "backend_api_manager";
-var MEK = "";
+var MEK = ""; /*Master Encryption Key (MEK) that will actually be used for encrypting and decrypting your data.*/
 var APP_LOCATION = "";
 
 /*

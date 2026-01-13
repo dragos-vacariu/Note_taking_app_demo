@@ -252,7 +252,9 @@ function LogIn_SignUp()
                 
                 //Generating encryption/decryption key
                 const salt = user_email; // simplest: unique per user
-                MEK = await deriveMEK(password, salt);
+                
+                MEK = await deriveMEK(password, salt); // stays in memory throught the session
+                alert(MEK);
                 
                 // Get the "Keep me logged in" checkbox value (if in login mode)
                 const rememberMeCheckbox = document.getElementById('rememberMe');

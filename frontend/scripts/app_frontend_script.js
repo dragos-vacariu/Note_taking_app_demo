@@ -301,46 +301,6 @@ function showStatusMessage(entryDiv, message, duration = 2000, result = "none")
 }
 
 // ---------------------------------------------------------
-// Function used to encrypt data before sending it to the server
-// ---------------------------------------------------------
-async function encryptData(MEK_KEY, plaintext)
-{
-    const iv = crypto.getRandomValues(new Uint8Array(12)); // random IV
-    const enc = new TextEncoder();
-    const data = enc.encode(plaintext);
-
-    const ciphertext = await crypto.subtle.encrypt(
-        { name: "AES-GCM", iv: iv },
-        MEK_KEY,
-        data
-    );
-
-    // Return base64 for easy storage
-    return {
-        iv: Array.from(iv), // store IV for decryption
-        ciphertext: btoa(String.fromCharCode(...new Uint8Array(ciphertext)))
-    };
-}
-
-// ---------------------------------------------------------
-// Function used to decrypt data received from the server
-// ---------------------------------------------------------
-async function decryptData(MEK_KEY, encrypted)
-{
-    const iv = new Uint8Array(encrypted.iv);
-    const data = Uint8Array.from(atob(encrypted.ciphertext), c => c.charCodeAt(0));
-
-    const decrypted = await crypto.subtle.decrypt(
-        { name: "AES-GCM", iv: iv },
-        MEK_KEY,
-        data
-    );
-
-    const dec = new TextDecoder();
-    return dec.decode(decrypted);
-}
-
-// ---------------------------------------------------------
 // Function that executes when Post button is clicked
 // used to save the note to the server
 // ---------------------------------------------------------
