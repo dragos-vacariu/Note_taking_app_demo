@@ -1,14 +1,19 @@
-let platform = "GitHub";
-var API_URL = "";
+// global variable
+let PLATFORM = location.href.startsWith("https://dragos-vacariu.github.io") ? "GitHub" : "";
+let API_URL = "";
+let API_SCRIPT = "backend_api_manager";
+let MEK;
 
-if(platform.toLowerCase() == "github")
+if(PLATFORM.toLowerCase() == "github")
 {
     API_URL = "https://dragos-vacariu-note-taking.vercel.app";
+    API_SCRIPT = "backend_api_manager_for_github";
 }
 
 
 // Returns token from localStorage (persistent) or sessionStorage (session)
-function getToken() {
+function getToken()
+{
     return localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
 }
 
@@ -102,4 +107,41 @@ async function validateTokenWithBackend()
     {
         return false;
     }
+}
+
+// Derive a 256-bit MEK from user's password
+async function deriveMEK(password, salt)
+{
+    // Convert password & salt to ArrayBuffer
+    const enc = new TextEncoder();
+    const passwordBuffer = enc.encode(password);
+    const saltBuffer = enc.encode(salt); // unique per user
+
+    // Import password as key material
+    const keyMaterial = await crypto.subtle.importKey(
+        "raw",
+        passwordBuffer,
+        { name: "PBKDF2" },
+        false,
+        ["deriveKey"]
+    );
+
+    // Derive MEK
+    const MEK = await crypto.subtle.deriveKey(
+        {
+            name: "PBKDF2",
+            salt: saltBuffer,
+            iterations: 100_000,      // safe default
+            hash: "SHA-256"
+        },
+        keyMaterial,
+        {
+            name: "AES-GCM",
+            length: 256
+        },
+        true,   // extractable key, allows exporting if needed
+        ["encrypt", "decrypt"]
+    );
+
+    return MEK;
 }

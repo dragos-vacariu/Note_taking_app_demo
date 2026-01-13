@@ -1,11 +1,12 @@
-let domain = "GitHub";
-var API_URL = "";
-
 let mode = 'login'; // default mode
 
-if(domain.toLowerCase() == "github")
+if(PLATFORM.toLowerCase() == "github")
 {
     API_URL = "https://dragos-vacariu-note-taking.vercel.app";
+    
+    document.getElementById("login_sigup").onclick = LogIn_SignUp;
+    document.getElementById("login_as_guest_button").onclick = LogIn_AsGuest;
+    document.getElementById("toggleMode").addEventListener('click', () => toggleLoginSignup());
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -16,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     {
         try {
             // Validate token with backend
-            const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
+            const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -52,139 +53,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     else
     {
-        renderExtraOptions();
+        if(PLATFORM.toLowerCase() == "github")
+        {
+            renderExtraOptions();
+        }
+        else
+        {
+            LogIn_SignUp();
+        }
     }
 });
 
-
-function LogIn_SignUp()
-{
-    const form = document.getElementById('authForm');
-    const messageDiv = document.getElementById('message');
-    
-    document.querySelector('input[name="password"]').setAttribute('required', '');
-    document.querySelector('input[name="email_address"]').setAttribute('required', '');
-    document.querySelector('input[name="password"]').required = true;
-    document.querySelector('input[name="email_address"]').required = true;
-    
-    //Initial render for login mode
-    renderExtraOptions(mode);
-    
-    //===========================
-    // Handle form submission
-    //===========================
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        messageDiv.innerText = '';
-
-        // Disable the submit button immediately
-        const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-
-        const user_email = form.email_address.value.trim();
-        const password = form.password.value.trim();
-
-        if (!user_email || !password) 
-        {
-            messageDiv.innerText = 'Please enter both email and password.';
-            submitBtn.disabled = false;  // re-enable
-            return;
-        }
-
-        if (!/\S+@\S+\.\S+/.test(user_email)) 
-        {
-            messageDiv.innerText = 'Please enter a valid email';
-            submitBtn.disabled = false;  // re-enable
-            return;
-        }
-        
-        const endpoint_function = mode === 'login' ? 'userLogin' : 'userSignUp';
-        
-        try {
-            const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                
-                //HTTP can only send strings through web... JSON.stringify my content
-                body: JSON.stringify({
-                    user_email: user_email,
-                    password: password,
-                    method_name: endpoint_function,
-                    method_params: {}
-                })
-            });
-
-            let data;
-            
-            try
-            {
-                data = await res.json();
-            }
-            
-            catch (err) 
-            {
-                console.error('Failed to parse JSON:', err);
-                submitBtn.disabled = false;  // re-enable
-                return;
-            }
-
-            if (res.ok) 
-            {
-                // Get the "Keep me logged in" checkbox value (if in login mode)
-                const rememberMeCheckbox = document.getElementById('rememberMe');
-                const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
-
-                const token = data.token;
-
-                // Save token to correct storage
-                if(rememberMe)
-                {
-                    localStorage.setItem('jwt_token', token);
-                } 
-                else
-                {
-                    sessionStorage.setItem('jwt_token', token);
-                }
-
-                messageDiv.style.color = 'green';
-
-                if (mode === 'signup') 
-                {
-                    messageDiv.innerText =
-                        'Signup successful! Please verify your email before logging in.';
-                }
-                else
-                {
-                    messageDiv.innerText = 'Login successful! Redirecting...';
-                    setTimeout(() => {
-                        window.location.href = 'https://dragos-vacariu.github.io/Note_taking_app_demo/frontend/app.html';
-                    }, 1000);
-                }
-            }
-            else
-            {
-                messageDiv.style.color = 'red';
-                messageDiv.innerText = data.message || 'Something went wrong';
-
-                if (data.message?.includes('not verified'))
-                {
-                    showResendVerification(user_email);
-                }
-            }
-        }
-        catch (err)
-        {
-            console.error('Network or fetch error:', err);
-            submitBtn.disabled = false;  // re-enable
-        }
-        finally
-        {
-            // Always re-enable button at the end
-            submitBtn.disabled = false;
-        }
-    });
-}
-
+//======================================================
+//Helper function that executes when Switch SignUp / Login button is pressed
+//======================================================
 function toggleLoginSignup()
 {
     const form = document.getElementById('authForm');
@@ -200,9 +82,9 @@ function toggleLoginSignup()
     renderExtraOptions(mode);
 }
 
-//===========================
-//Helper function to render checkbox dynamically
-//===========================
+//======================================================
+//Helper function to render extraOptions checkboxes dynamically
+//======================================================
 function renderExtraOptions() 
 {
     const extraOptions = document.getElementById('extraOptions');
@@ -256,7 +138,7 @@ function showResendVerification(user_email)
 
         try
         {
-            const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
+            const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 
@@ -290,32 +172,55 @@ function showResendVerification(user_email)
     messageDiv.appendChild(link);
 }
 
-async function LogIn_AsGuest()
+/*Function to attempt to connect to the server for login/signup */
+function LogIn_SignUp()
 {
+    const form = document.getElementById('authForm');
+    const toggleBtn = document.getElementById('toggleMode');
     const messageDiv = document.getElementById('message');
 
-    document.querySelector('input[name="password"]').removeAttribute('required');
-    document.querySelector('input[name="email_address"]').removeAttribute('required');
+    let mode = 'login'; // default mode
     
+    //Initial render for login mode
+    renderExtraOptions(mode);
     
-    const user_email = "guest@admin_drva_apps.com";
-    const password = "demoLMI09238#!";
+    //===========================
+    //Toggle login/signup mode
+    //===========================
+    toggleBtn.addEventListener('click', () => toggleLoginSignup());
     
-    /*
-    if (!user_email || !password) 
-    {
-        messageDiv.innerText = 'Please enter both email and password.';
-        return;
-    }
-    
-    if (!/\S+@\S+\.\S+/.test(user_email)) 
-    {
-        messageDiv.innerText = 'Please enter a valid email';
-        return;
-    }*/
-    
-    try {
-            const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
+    //===========================
+    // Handle form submission
+    //===========================
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        messageDiv.innerText = '';
+
+        // Disable the submit button immediately
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+
+        const user_email = form.email_address.value.trim();
+        const password = form.password.value.trim();
+
+        if (!user_email || !password) 
+        {
+            messageDiv.innerText = 'Please enter both email and password.';
+            submitBtn.disabled = false;  // re-enable
+            return;
+        }
+
+        if (!/\S+@\S+\.\S+/.test(user_email)) 
+        {
+            messageDiv.innerText = 'Please enter a valid email';
+            submitBtn.disabled = false;  // re-enable
+            return;
+        }
+        
+        const endpoint_function = mode === 'login' ? 'userLogin' : 'userSignUp';
+        
+        try {
+            const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 
@@ -323,7 +228,7 @@ async function LogIn_AsGuest()
                 body: JSON.stringify({
                     user_email: user_email,
                     password: password,
-                    method_name: "userLogin",
+                    method_name: endpoint_function,
                     method_params: {}
                 })
             });
@@ -344,6 +249,11 @@ async function LogIn_AsGuest()
 
             if (res.ok) 
             {
+                
+                //Generating encryption/decryption key
+                const salt = user_email; // simplest: unique per user
+                MEK = await deriveMEK(password, salt);
+                
                 // Get the "Keep me logged in" checkbox value (if in login mode)
                 const rememberMeCheckbox = document.getElementById('rememberMe');
                 const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
@@ -362,23 +272,116 @@ async function LogIn_AsGuest()
 
                 messageDiv.style.color = 'green';
 
-                messageDiv.innerText = 'Login successful! Redirecting...';
-                setTimeout(() => {
-                    window.location.href = 'https://dragos-vacariu.github.io/Note_taking_app_demo/frontend/app.html';
-                }, 1000);
+                if (mode === 'signup') 
+                {
+                    messageDiv.innerText =
+                        'Signup successful! Please verify your email before logging in.';
+                }
+                else
+                {
+                    messageDiv.innerText = 'Login successful! Redirecting...';
+                    setTimeout(() => {
+                        window.location.href = '/frontend/app.html';
+                    }, 1000);
+                }
             }
             else
             {
                 messageDiv.style.color = 'red';
                 messageDiv.innerText = data.message || 'Something went wrong';
+
+                if (data.message?.includes('not verified'))
+                {
+                    showResendVerification(user_email);
+                }
             }
         }
         catch (err)
         {
             console.error('Network or fetch error:', err);
+            submitBtn.disabled = false;  // re-enable
         }
+        finally
+        {
+            // Always re-enable button at the end
+            submitBtn.disabled = false;
+        }
+    });
 }
 
-document.getElementById("login_sigup").onclick = LogIn_SignUp;
-document.getElementById("login_as_guest_button").onclick = LogIn_AsGuest;
-document.getElementById("toggleMode").addEventListener('click', () => toggleLoginSignup());
+async function LogIn_AsGuest()
+{
+    const messageDiv = document.getElementById('message');
+
+    document.querySelector('input[name="password"]').removeAttribute('required');
+    document.querySelector('input[name="email_address"]').removeAttribute('required');
+    
+    
+    const user_email = "guest@admin_drva_apps.com";
+    const password = "demoLMI09238#!";
+    
+    try
+    {
+        const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            
+            //HTTP can only send strings through web... JSON.stringify my content
+            body: JSON.stringify({
+                user_email: user_email,
+                password: password,
+                method_name: "userLogin",
+                method_params: {}
+            })
+        });
+
+        let data;
+        
+        try
+        {
+            data = await res.json();
+        }
+        
+        catch (err) 
+        {
+            console.error('Failed to parse JSON:', err);
+            submitBtn.disabled = false;  // re-enable
+            return;
+        }
+
+        if (res.ok) 
+        {
+            // Get the "Keep me logged in" checkbox value (if in login mode)
+            const rememberMeCheckbox = document.getElementById('rememberMe');
+            const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
+
+            const token = data.token;
+
+            // Save token to correct storage
+            if(rememberMe)
+            {
+                localStorage.setItem('jwt_token', token);
+            } 
+            else
+            {
+                sessionStorage.setItem('jwt_token', token);
+            }
+
+            messageDiv.style.color = 'green';
+
+            messageDiv.innerText = 'Login successful! Redirecting...';
+            setTimeout(() => {
+                window.location.href = 'https://dragos-vacariu.github.io/Note_taking_app_demo/frontend/app.html';
+            }, 1000);
+        }
+        else
+        {
+            messageDiv.style.color = 'red';
+            messageDiv.innerText = data.message || 'Something went wrong';
+        }
+    }
+    catch (err)
+    {
+        console.error('Network or fetch error:', err);
+    }
+}

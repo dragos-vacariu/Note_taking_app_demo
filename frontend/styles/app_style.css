@@ -62,39 +62,103 @@ body
     box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
-.jour_entry_title
+.jour_entry #jour_entry_title, .jour_entry #jour_entry_content, .jour_entry #text_editor_toolbar 
+{
+    width: 98%;
+    margin: 2px 0px;
+    padding: 0.5%;
+}
+
+.jour_entry #jour_entry_title
 {
     background-color: var(--light-gray-color);
     font: var(--post-title-font);
     color: var(--darkblue-color);
-    width: 98%;
-    margin: 2px 1%;
-    padding: 0.5% 1%;
     border-radius: 1vw;
-    /*The following will ensure that the width of the element will not grow with the added border-size.
-    So the border will be within the defined element width.
-    */
-    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-    box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
-.jour_entry_content
+.jour_entry #jour_entry_content
 {
     background-color: var(--light-gray-color);
     font: var(--post-content-font); 
     color: black;
     field-sizing: content;
-    width: 98%;
-    margin: 1%;
-    padding: 0.5%;
+
     border-radius: 1vw;
-    /*The following will ensure that the width of the element will not grow with the added border-size.
-    So the border will be within the defined element width.
-    */
-    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-    box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
+#postControls {
+    display: flex;
+    align-items: center; /* vertically center button + status box */
+    gap: 6px; /* space between the ... button and status box */
+}
+
+#statusInfo {
+    display: inline-block;
+    min-width: 50px;
+    padding: auto;
+    font: var(--button-font);
+    font-size: 15px;
+    color: #555555;
+    border-radius: 4px;
+    border: none 2px red;
+    text-align: center;
+    opacity: 0; /* initially hidden */
+    transition: opacity 0.5s ease, transform 0.3s ease;
+
+    pointer-events: none; /* prevent clicks */
+}
+
+
+.jour_entry #text_editor_toolbar
+{
+    padding: 0px 6px;
+    font: var(--button-font);
+    cursor: pointer;
+    height: 26px;            /* force consistent height */
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+#text_editor_toolbar .toolbar_button
+{
+    padding: 3px 5px;
+    border: groove 1px #555555;
+    border-radius: 0px;
+    background-color: rgba(100 100 100, 1.0);
+    height: 26px;            /* force consistent height */
+    color: #555555;
+    font: var(--button-font);
+    cursor: pointer;
+    
+}
+
+#text_editor_toolbar .colorPicker{
+    position: relative;
+    top: 3px;
+    margin: 0px 2px;
+    padding: 0px;
+    height: 26px;            /* force consistent height */
+    /* Remove native styles */
+    appearance: none;
+    -webkit-appearance: none;
+
+}
+
+#text_editor_toolbar .fontSizeSelect{
+        position: relative;
+
+    margin: 0px 2px;
+    padding: 0px;
+    height: 26px;            /* force consistent height */
+    /* Remove native styles */
+}
+
+#text_editor_toolbar .toolbar_button:hover
+{
+    background-color: var(--blue-color);
+    color: white;
 }
 
 /* Basic styling for the button */
