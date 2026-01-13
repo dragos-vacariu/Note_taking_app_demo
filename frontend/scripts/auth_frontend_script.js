@@ -1,9 +1,9 @@
 // global variable
-export var PLATFORM = location.href.startsWith("https://dragos-vacariu.github.io") ? "GitHub" : "";
-export var API_URL = "";
-export var API_SCRIPT = "backend_api_manager";
-export var MEK = "";
-export var APP_LOCATION = "";
+var PLATFORM = location.href.startsWith("https://dragos-vacariu.github.io") ? "GitHub" : "";
+var API_URL = "";
+var API_SCRIPT = "backend_api_manager";
+var MEK = "";
+var APP_LOCATION = "";
 
 /*
 var variable have global scope (and can be used in external files).

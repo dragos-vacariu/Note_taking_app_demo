@@ -1,6 +1,3 @@
-/*Importing global variables from the external module*/
-import { PLATFORM, API_URL, API_SCRIPT, MEK, APP_LOCATION } from './auth_frontend_script.js';
-
 // Top-level variables accessible to both functions
 const messageEl = document.querySelector('.message');
 const resendBtn = document.getElementById('resendBtn');

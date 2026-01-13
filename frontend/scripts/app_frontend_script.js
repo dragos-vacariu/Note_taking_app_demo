@@ -1,6 +1,3 @@
-/*Importing global variables from the external module*/
-import { PLATFORM, API_URL, API_SCRIPT, MEK, APP_LOCATION } from './auth_frontend_script.js';
-
 const enabledEditableDivBorderStyle = "inset 1px rgba(0,0,0,0.5)";
 let notesCache = []; // Cache for notes loaded from backend
 
