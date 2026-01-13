@@ -167,12 +167,14 @@ function addNoteToUI(title, content, id, edit_mode=false)
     //ADDING THE DATA TO THE POST
     const titleDiv = document.createElement('div');
     titleDiv.id = 'jour_entry_title';
-    titleDiv.innerHTML = decryptData(MEK, title);
+    titleDiv.innerHTML = title;
+    //titleDiv.innerHTML = decryptData(MEK, title);
     titleDiv.contentEditable = false;
 
     const contentDiv = document.createElement('div');
     contentDiv.id = 'jour_entry_content';
-    contentDiv.innerHTML = decryptData(MEK, content);
+    //contentDiv.innerHTML = decryptData(MEK, content);
+    contentDiv.innerHTML = content;
     contentDiv.contentEditable = false;
     
     // simulate "5 rows"
