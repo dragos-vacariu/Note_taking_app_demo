@@ -1,10 +1,15 @@
 const enabledEditableDivBorderStyle = "inset 1px rgba(0,0,0,0.5)";
 let notesCache = []; // Cache for notes loaded from backend
 
-window.onload = function() {
+window.onload = async function() {
     // Ensure user is logged in; redirects to login if not
-    requireLogin();
-
+    const user = await requireLogin();
+    
+    if (!user) 
+    {
+        window.location.href = APP_LOCATION + '/frontend/login.html';
+        return;
+    }
     // Show logged user info
     showLoggedUser();
 
@@ -33,7 +38,10 @@ function toggleEdit()
     if(toggleDropdownButton)
     {
         toggleDropdownButton.textContent = "Post";
-        toggleDropdownButton.onclick = saveEdit;
+        toggleDropdownButton.onclick = async (e) => {
+          await saveEdit(e);
+          // other code after async operation completes
+        };
     }
     
     const titleDiv = entry_post.querySelector("#jour_entry_title");
@@ -304,9 +312,20 @@ function showStatusMessage(entryDiv, message, duration = 2000, result = "none")
 // Function that executes when Post button is clicked
 // used to save the note to the server
 // ---------------------------------------------------------
-function saveEdit()
+async function saveEdit(e)
 {
-    const entry_post = this.closest('.jour_entry');
+    /*
+        e.target
+        The actual element that triggered the event.
+        It’s the deepest element that was clicked or interacted with.
+        Can be a child element inside the element the event listener is attached to.
+        
+        e.currentTarget
+        The element the event listener is actually attached to.
+        Never changes during event propagation (bubbling).
+        Always what you expect if you want the “owner” element.
+    */
+    const entry_post = e.currentTarget.closest('.jour_entry');
     const noteId = entry_post.dataset.id;
     
     const titleDiv = entry_post.querySelector("#jour_entry_title");
@@ -324,14 +343,15 @@ function saveEdit()
         const title = titleDiv.innerHTML;
         
         //Encrypting data:
-        const encryptedTitle = encryptData(MEK, title);
+        const encryptedTitle = await encryptData(MEK, title);
         
         //contentDiv.contentEditable = "true";
         //contentDiv.style.border = enabledEditableDivBorderStyle;
         const content = contentDiv.innerHTML;
         
         //Encrypting data:
-        const encryptedContent = encryptData(MEK, content);
+        const encryptedContent = await encryptData(MEK, content);
+        console.log(MEK)
         
         const idx = notesCache.findIndex(n => n.id === noteId);
     
@@ -377,7 +397,7 @@ function saveEdit()
         {
             toggleDropdownButton.innerText = '...';
             toggleDropdownButton.onclick = function() {
-                toggleDropdown(this); 
+                toggleDropdown(e.currentTarget); 
             };
         }
         

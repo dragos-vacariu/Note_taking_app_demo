@@ -59,15 +59,22 @@ function isLoggedIn()
 }
 
 // Must be called at page load to protect the page
-function requireLogin() 
+async function requireLogin() 
 {
     const payload = getTokenPayload();
-    if (!payload)
-    {
-        // Redirect if token missing or malformed
-        //window.location.href = '/frontend/login.html';
+    if (!payload) {
         return null;
     }
+    
+    //Load the MEK
+    MEK = await loadMEK();
+
+    if (!MEK) {
+        alert("Encryption key missing. Please log in again.");
+        sessionStorage.removeItem("jwt_token");
+        return null;
+    }
+
     return payload;
 }
 
@@ -151,4 +158,20 @@ async function deriveMEK(password, salt)
     );
 
     return MEK;
+}
+
+async function loadMEK() 
+{
+    const stored = sessionStorage.getItem("MEK");
+    if (!stored) return null;
+
+    const raw = Uint8Array.from(atob(stored), c => c.charCodeAt(0));
+
+    return crypto.subtle.importKey(
+        "raw",
+        raw,
+        { name: "AES-GCM" },
+        false,
+        ["encrypt", "decrypt"]
+    );
 }

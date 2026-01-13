@@ -254,6 +254,7 @@ function LogIn_SignUp()
                 const salt = user_email; // simplest: unique per user
                 
                 MEK = await deriveMEK(password, salt); // stays in memory throught the session
+                await storeMEK(MEK);
                 alert(MEK);
                 
                 // Get the "Keep me logged in" checkbox value (if in login mode)
@@ -353,6 +354,11 @@ async function LogIn_AsGuest()
 
         if (res.ok) 
         {
+            
+            MEK = await deriveMEK(password, salt); // stays in memory throught the session
+            await storeMEK(MEK);
+            alert(MEK);
+            
             // Get the "Keep me logged in" checkbox value (if in login mode)
             const rememberMeCheckbox = document.getElementById('rememberMe');
             const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
