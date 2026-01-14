@@ -23,16 +23,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         {
             const token = getToken();
             
-            // Load notes/decrypt from backend
-            await loadNotes();
-            
-            //Generating encryption/decryption key
-            const salt = newEmail; // simplest: unique per user
-                
-            const newMEK = await deriveMEK(userPassword, salt); // stays in memory throught the session
-            
-            const reEncryptedNotes = await getEncryptedNotes(newMEK);
-            
             const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
                 method: 'POST',
                 headers: authHeaders(),
@@ -41,12 +31,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: JSON.stringify({
                     newEmail: newEmail,
                     currentPassword: userPassword,
-                    notes: reEncryptedNotes,
                     token: token,
                     method_name: 'updateUserSettings',
                     method_params: {}
                 })
             });
+            
+            if (!res.ok)
+            {
+                if (res.status === 401)
+                {
+                    alert('Session expired. Please log in again.');
+                    logoutUser();
+                    return;
+                }
+                throw new Error('Failed to load notes');
+            }
+            
             const data = await res.json();
             emailMessage.textContent = data.message;
             emailMessage.className = data.success ? 'success' : 'error';
@@ -89,6 +90,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method_params: {}
                 })
             });
+            
+            if (!res.ok)
+            {
+                if (res.status === 401)
+                {
+                    alert('Session expired. Please log in again.');
+                    logoutUser();
+                    return;
+                }
+                throw new Error('Failed to load notes');
+            }
+            
             const data = await res.json();
             passwordMessage.textContent = data.message;
             passwordMessage.className = data.success ? 'success' : 'error';
@@ -101,10 +114,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             //Generating encryption/decryption key
             const salt = currentEmail; // simplest: unique per user
                 
-            MEK = await deriveMEK(currentPassword, salt); // stays in memory throught the session
+            MEK = await deriveMEK(newPassword, salt); // stays in memory throught the session
             await storeMEK(MEK);
             
             await saveUserNotesToDatabase();
+            
         }
         catch
         {

@@ -10,8 +10,13 @@ if(PLATFORM.toLowerCase() == "github")
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    
+    //Load the token from the localStorage
     const token = localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
-    loadMEK();
+    
+    //Load the MEKs from the sessionStorage:
+    MEK = await loadMEK();
+    oldMEK = await loadOldMEK(); /*if any oldMEK*/
     
     //Checking if user is already authenticated
     if (token && MEK) 
@@ -220,7 +225,8 @@ function LogIn_SignUp()
         
         const endpoint_function = mode === 'login' ? 'userLogin' : 'userSignUp';
         
-        try {
+        try
+        {
             const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -233,28 +239,37 @@ function LogIn_SignUp()
                     method_params: {}
                 })
             });
-
-            let data;
             
+            let data = null;
             try
             {
-                data = await res.json();
+                data = await res.json();   //Parse ONCE
             }
-            
-            catch (err) 
+            catch (err)
             {
                 console.error('Failed to parse JSON:', err);
-                submitBtn.disabled = false;  // re-enable
+                submitBtn.disabled = false;
                 return;
             }
 
             if (res.ok) 
             {
-                
+                //Check if there is a migration ongoing
+                if (data)
+                {
+                    const preMigrationEmailAddress = data.preMigrationEmailAddress;
+                    
+                    if(preMigrationEmailAddress)
+                    {
+                        oldMEK = await deriveMEK(password, preMigrationEmailAddress); // stays in memory throught the session
+                        //console.log("Setting old MEK: " + oldMEK)
+                        await storeOldMEK(oldMEK);
+                    }
+                }
                 //Generating encryption/decryption key
                 const salt = user_email; // simplest: unique per user
-                
                 MEK = await deriveMEK(password, salt); // stays in memory throught the session
+                
                 await storeMEK(MEK);
                 
                 // Get the "Keep me logged in" checkbox value (if in login mode)
@@ -337,26 +352,37 @@ async function LogIn_AsGuest()
                 method_params: {}
             })
         });
-
-        let data;
         
+        let data = null;
         try
         {
-            data = await res.json();
+            data = await res.json();   //Parse ONCE
         }
-        
-        catch (err) 
+        catch (err)
         {
             console.error('Failed to parse JSON:', err);
-            submitBtn.disabled = false;  // re-enable
+            submitBtn.disabled = false;
             return;
         }
-
+        
         if (res.ok) 
-        {
+        {   
+            //Check if there is a migration ongoing
+            if (data)
+            {
+                const preMigrationEmailAddress = data.preMigrationEmailAddress;
+                
+                if(preMigrationEmailAddress)
+                {
+                    oldMEK = await deriveMEK(password, preMigrationEmailAddress); // stays in memory throught the session
+                    await storeOldMEK(oldMEK);
+                }
+            }
+            
             //Generating encryption/decryption key
             const salt = user_email; // simplest: unique per user
             MEK = await deriveMEK(password, salt); // stays in memory throught the session
+            
             await storeMEK(MEK);
             
             // Get the "Keep me logged in" checkbox value (if in login mode)

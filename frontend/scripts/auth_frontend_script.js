@@ -3,6 +3,7 @@ var PLATFORM = location.href.startsWith("https://dragos-vacariu.github.io") ? "G
 var API_URL = "";
 var API_SCRIPT = "backend_api_manager";
 var MEK = ""; /*Master Encryption Key (MEK) that will actually be used for encrypting and decrypting your data.*/
+var oldMEK = null; /*pre-Migration Master Encryption Key (MEK)*/
 var APP_LOCATION = "";
 var NOTES_CACHE = []; // Cache for notes loaded from backend
 
@@ -15,7 +16,7 @@ if(PLATFORM.toLowerCase() == "github")
 {
     API_URL = "https://dragos-vacariu-note-taking.vercel.app";
     APP_LOCATION = "https://dragos-vacariu.github.io/Note_taking_app_demo";
-    API_SCRIPT = "backend_api_manager_for_github";
+    //API_SCRIPT = "backend_api_manager_for_github";
 }
 
 // -------------------------------------------------------------------------------
@@ -38,8 +39,10 @@ async function getTokenPayload()
     }
     
     const result = await validateTokenWithBackend();
+    
     if (!result)
     {
+
         logoutUser();
         return null;
     }
@@ -78,12 +81,15 @@ async function isLoggedIn()
 async function requireLogin() 
 {
     const payload = await getTokenPayload();
-    if (!payload) {
+    
+    if (!payload)
+    {
         return null;
     }
     
     //Load the MEK
     MEK = await loadMEK();
+    oldMEK = await loadOldMEK(); /*if any old MEK*/
 
     if (!MEK)
     {
@@ -184,6 +190,7 @@ async function deriveMEK(password, salt)
 
     return MEK;
 }
+
 // -------------------------------------------------------------------------------
 // Function used to load MEK from the sessionStorage
 // -------------------------------------------------------------------------------
@@ -206,9 +213,46 @@ async function loadMEK()
 // -------------------------------------------------------------------------------
 // Function used to store the MEK throughtout the session.
 // -------------------------------------------------------------------------------
-async function storeMEK(MEK)
+async function storeMEK(MEK_key)
 {
-    const raw = await crypto.subtle.exportKey("raw", MEK);
+    const raw = await crypto.subtle.exportKey("raw", MEK_key);
     const base64 = btoa(String.fromCharCode(...new Uint8Array(raw)));
     sessionStorage.setItem("MEK", base64);
+}
+
+// -------------------------------------------------------------------------------
+// Function used to load oldMEK from the sessionStorage
+// -------------------------------------------------------------------------------
+async function loadOldMEK() 
+{
+    const stored = sessionStorage.getItem("oldMEK");
+    if (!stored) return null;
+
+    const raw = Uint8Array.from(atob(stored), c => c.charCodeAt(0));
+
+    return crypto.subtle.importKey(
+        "raw",
+        raw,
+        { name: "AES-GCM" },
+        false,
+        ["encrypt", "decrypt"]
+    );
+}
+
+// -------------------------------------------------------------------------------
+// Function used to store the oldMEK throughtout the session.
+// -------------------------------------------------------------------------------
+async function storeOldMEK(MEK_key)
+{
+    const raw = await crypto.subtle.exportKey("raw", MEK_key);
+    const base64 = btoa(String.fromCharCode(...new Uint8Array(raw)));
+    sessionStorage.setItem("oldMEK", base64);
+}
+
+// -------------------------------------------------------------------------------
+// Function used to discard the oldMEK from the session.
+// -------------------------------------------------------------------------------
+async function discardOldMEK()
+{
+    sessionStorage.removeItem("oldMEK");
 }

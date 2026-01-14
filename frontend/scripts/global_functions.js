@@ -38,23 +38,59 @@ async function loadNotes()
         {
             return;
         }
+        
+        if (!oldMEK && data.preMigrationEmailAddress)
+        {
+            alert("Hello user!" +
+                  "\n\nYour account's migration from: " + data.preMigrationEmailAddress + " to " + 
+                  data.email + " is ongoing." +
+                  "\n\nTo complete the migration - you will need to login again!" +
+                  "\n\nThank you, \n\nAdmin"
+                  );
+            logoutUser();
+        }
+        
         NOTES_CACHE = [];
 
         for (const note of data.notes)
         {
             // Use await properly inside an async function
-            console.log("Decrypting Title: " + note.title);
-            let decryptedTitle = await decryptData(MEK, note.title);
-            console.log("Decrypting Content: " + note.content);
-            let decryptedContent = await decryptData(MEK, note.content);
+            
+            let decryptedTitle;
+            let decryptedContent;
+            
+            // If notes read for the first time after account migration to a new email address:
+            console.log("MEK: " + MEK)
+            console.log("oldMEK: " + oldMEK)
+            
+            if(oldMEK)
+            {
+                decryptedTitle = await decryptData(oldMEK, note.title);
+                console.log("PostMigration - Decrypting Title: " + note.title);
+                
+                decryptedContent = await decryptData(oldMEK, note.content);
+                console.log("PostMigration - Decrypting Content: " + note.content);
+            }
+            else
+            {
+                decryptedTitle = await decryptData(MEK, note.title);
+                console.log("Decrypting Title: " + note.title);
+                
+                decryptedContent = await decryptData(MEK, note.content);
+                console.log("Decrypting Content: " + note.content);
+            }
             
             NOTES_CACHE.push({ id: note.id, title: decryptedTitle, content: decryptedContent });
         }
 
         console.log("Notes read: ", NOTES_CACHE);
-        // Optionally: render notes to UI
-        // NOTES_CACHE.forEach(note => addNoteToUI(note.decryptedTitle, note.decryptedContent, note.id));
-
+        
+        // If notes read for the first time after account migration to a new email address:
+        if(oldMEK)
+        {
+            saveUserNotesToDatabase(migration_flag = true);
+            discardOldMEK();
+        }
     }
     catch (err)
     {
@@ -66,24 +102,46 @@ async function loadNotes()
 // ---------------------------------------------------------
 // Function used to save user notes to server
 // ---------------------------------------------------------
-async function saveUserNotesToDatabase()
+async function saveUserNotesToDatabase(migration_flag = false) 
 {
-    const encryptedNotes = await getEncryptedNotes(MEK);
-        
-    fetch(API_URL + '/api/' + API_SCRIPT, {
-        method: 'POST',
-        headers: authHeaders(),
-        
-        //HTTP can only send strings through web... JSON.stringify my content
-        body: JSON.stringify({
-            notes: encryptedNotes,
-            method_name: 'saveUserNotes',
-            method_params: {}
-        })
-    })//no ; means the following .then/.catch will wait for the server response before executing
-        .then(res => res.json())
-        .then(() => showStatusMessage(entry_post, "Saved successfully!", 3000, "success"))
-        .catch(() => showStatusMessage(entry_post, "Server failure - changes not saved!", 3000, "failure"));
+    try
+    {
+        const encryptedNotes = await getEncryptedNotes(MEK);
+
+        const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({
+                notes: encryptedNotes,
+                migration_flag: migration_flag,
+                method_name: 'saveUserNotes',
+                method_params: {}
+            })
+        });
+
+        // Handle session invalidation
+        if (res.status === 401)
+        {
+            logoutUser();
+            alert("Your session has expired or was invalidated. Please log in again.");
+            window.location.href = APP_LOCATION + "/frontend/login.html";
+            return;
+        }
+
+        if (!res.ok)
+        {
+            throw new Error("Server error");
+        }
+
+        const data = await res.json();
+
+        showStatusMessage(entry_post, "Saved successfully!", 3000, "success");
+    }
+    catch (err)
+    {
+        console.error(err);
+        showStatusMessage(entry_post, "Server failure - changes not saved!", 3000, "failure");
+    }
 }
 
 // ---------------------------------------------------------
