@@ -22,6 +22,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         try
         {
             const token = getToken();
+            
+            // Load notes/decrypt from backend
+            await loadNotes();
+            
+            //Generating encryption/decryption key
+            const salt = currentEmail; // simplest: unique per user
+                
+            const newMEK = await deriveMEK(userPassword, salt); // stays in memory throught the session
+            
+            const reEncryptedNotes = await getEncryptedNotes(newMEK);
+            
             const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
                 method: 'POST',
                 headers: authHeaders(),
@@ -30,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: JSON.stringify({
                     newEmail: newEmail,
                     currentPassword: userPassword,
+                    notes: reEncryptedNotes,
                     token: token,
                     method_name: 'updateUserSettings',
                     method_params: {}
@@ -39,18 +51,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             emailMessage.textContent = data.message;
             emailMessage.className = data.success ? 'success' : 'error';
             
-            if (!data.success) return;   //STOP if password wrong
+            //if (!data.success) return;   //STOP if password wrong
             
-            // Load notes/decrypt from backend
-            await loadNotes();
-            
-            //Generating encryption/decryption key
-            const salt = currentEmail; // simplest: unique per user
-                
-            MEK = await deriveMEK(userPassword, salt); // stays in memory throught the session
-            await storeMEK(MEK);
-            
-            await saveUserNotesToDatabase();
         }
         catch
         {

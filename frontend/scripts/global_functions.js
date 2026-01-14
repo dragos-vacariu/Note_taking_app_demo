@@ -68,7 +68,7 @@ async function loadNotes()
 // ---------------------------------------------------------
 async function saveUserNotesToDatabase()
 {
-    const encryptedNotes = await getEncryptedNotes();
+    const encryptedNotes = await getEncryptedNotes(MEK);
         
     fetch(API_URL + '/api/' + API_SCRIPT, {
         method: 'POST',
@@ -89,14 +89,14 @@ async function saveUserNotesToDatabase()
 // ---------------------------------------------------------
 // Helper Function used to encrypt user notes
 // ---------------------------------------------------------
-async function getEncryptedNotes()
+async function getEncryptedNotes(MEK_Key)
 {
     let encrypted_notes = [];
     
     for (note of NOTES_CACHE)
     {
-        const encryptedTitle = await encryptData(MEK, note.title);
-        const encryptedContent = await encryptData(MEK, note.content);
+        const encryptedTitle = await encryptData(MEK_Key, note.title);
+        const encryptedContent = await encryptData(MEK_Key, note.content);
         encrypted_notes.push( {id: note.id, title: encryptedTitle, content: encryptedContent} );
     }
     return encrypted_notes;
