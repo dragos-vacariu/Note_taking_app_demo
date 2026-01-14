@@ -7,7 +7,7 @@ async function loadNotes()
 
     if (!user)
     {
-        window.location.href = APP_LOCATION + '/frontend/login.html';
+        //window.location.href = APP_LOCATION + '/frontend/login.html';
         return;
     }
 
@@ -26,8 +26,8 @@ async function loadNotes()
         {
             if (res.status === 401)
             {
-                alert('Session expired. Please log in again.');
-                logoutUser();
+                alert('3Session expired. Please log in again.');
+                //logoutUser();
                 return;
             }
             throw new Error('Failed to load notes');
@@ -47,7 +47,7 @@ async function loadNotes()
                   "\n\nTo complete the migration - you will need to login again!" +
                   "\n\nThank you, \n\nAdmin"
                   );
-            logoutUser();
+            //logoutUser();
         }
         
         NOTES_CACHE = [];
@@ -88,8 +88,13 @@ async function loadNotes()
         // If notes read for the first time after account migration to a new email address:
         if(oldMEK)
         {
-            saveUserNotesToDatabase(migration_flag = true);
+            let result = saveUserNotesToDatabase(migration_flag = true);
             discardOldMEK();
+            
+            if(result)
+            {
+                /*Send notification mail that migration is complete.*/
+            }
         }
     }
     catch (err)
@@ -122,8 +127,8 @@ async function saveUserNotesToDatabase(migration_flag = false)
         // Handle session invalidation
         if (res.status === 401)
         {
-            logoutUser();
-            alert("Your session has expired or was invalidated. Please log in again.");
+            //logoutUser();
+            alert("2Your session has expired or was invalidated. Please log in again.");
             window.location.href = APP_LOCATION + "/frontend/login.html";
             return;
         }
@@ -135,12 +140,12 @@ async function saveUserNotesToDatabase(migration_flag = false)
 
         const data = await res.json();
 
-        showStatusMessage(entry_post, "Saved successfully!", 3000, "success");
+        return true;
     }
     catch (err)
     {
         console.error(err);
-        showStatusMessage(entry_post, "Server failure - changes not saved!", 3000, "failure");
+        return false;
     }
 }
 
@@ -168,5 +173,8 @@ function logoutUser()
     localStorage.removeItem('jwt_token');
     sessionStorage.removeItem('jwt_token');
     sessionStorage.removeItem("MEK");
-    window.location.href = APP_LOCATION + '/frontend/login.html';
+    
+    setTimeout(() => {
+        window.location.href = APP_LOCATION + '/frontend/login.html';
+    }, 1000);
 }

@@ -32,8 +32,6 @@ async function verifyEmail(token)
     try {
         //const res = await fetch(`/api/verifyEmail_backend?token=${token}`);
         
-        logoutUser();
-        
         const res = await fetch(`/api/backend_api_manager?token=${token}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

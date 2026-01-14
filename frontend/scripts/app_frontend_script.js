@@ -333,8 +333,16 @@ async function saveEdit(e)
             NOTES_CACHE.push({ id: noteId, title: title, content: content });
         }
         
-        await saveUserNotesToDatabase();
+        let result = await saveUserNotesToDatabase();
         
+        if (result)
+        {
+            showStatusMessage(entry_post, "Saved successfully!", 3000, "success");
+        }
+        else
+        {
+            showStatusMessage(entry_post, "Server failure - changes not saved!", 3000, "failure");
+        }
         titleDiv.contentEditable = "false";
         titleDiv.style.border = "none";
         contentDiv.contentEditable = "false";
@@ -359,7 +367,7 @@ async function saveEdit(e)
     }
     else
     {
-        showStatusMessage(entry_post, "Error. Refresh and try again!", 3000, "failure")
+        showStatusMessage(entry_post, "Error. Refresh and try again!", 3000, "failure");
     }
 }
 
@@ -371,10 +379,7 @@ async function addPost()
     /*Check if user's authentication is still valid*/
     const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
+        headers: authHeaders(),
         
         //HTTP can only send strings through web... JSON.stringify my content
         body: JSON.stringify({
@@ -386,10 +391,12 @@ async function addPost()
     {
         if (res.status === 401)
         {
-            alert('Session expired. Please log in again.');
-            logoutUser();
+            alert('1.Session expired. Please log in again.');
+            //logoutUser();
             return;
         }
+        alert('Server error. No response.');
+        return;
     }
     
     const newId = 'note-' + Date.now();

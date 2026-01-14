@@ -12,6 +12,21 @@ var variable have global scope (and can be used in external files).
 let variable have global scope ONLY in the file in which is declared.
 */
 
+document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState === "visible")
+    {
+        console.log("Tab is now active");
+
+        const isValid = await validateTokenWithBackend();
+        
+        if (!isValid)
+        {
+            alert('Session expired. Please log in again.');
+            //logoutUser();
+        }
+    }
+});
+
 if(PLATFORM.toLowerCase() == "github")
 {
     API_URL = "https://dragos-vacariu-note-taking.vercel.app";
@@ -43,7 +58,7 @@ async function getTokenPayload()
     if (!result)
     {
 
-        logoutUser();
+        //logoutUser();
         return null;
     }
     
@@ -144,7 +159,20 @@ async function validateTokenWithBackend()
         });
         
         const data = await res.json();
-        return data.valid === true;
+
+        console.log("Status:", res.status);
+        console.log("Data:", data);
+
+        if (res.status === 401)
+        {
+            return false;
+        }
+        
+        if (data.success === true)
+        {
+            return true;
+        }
+        return false; // fallback
     }
     catch
     {

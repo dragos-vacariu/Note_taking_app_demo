@@ -36,18 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method_params: {}
                 })
             });
-            
-            if (!res.ok)
-            {
-                if (res.status === 401)
-                {
-                    alert('Session expired. Please log in again.');
-                    logoutUser();
-                    return;
-                }
-                throw new Error('Failed to load notes');
-            }
-            
             const data = await res.json();
             emailMessage.textContent = data.message;
             emailMessage.className = data.success ? 'success' : 'error';
@@ -90,24 +78,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method_params: {}
                 })
             });
-            
-            if (!res.ok)
-            {
-                if (res.status === 401)
-                {
-                    alert('Session expired. Please log in again.');
-                    logoutUser();
-                    return;
-                }
-                throw new Error('Failed to load notes');
-            }
-            
             const data = await res.json();
             passwordMessage.textContent = data.message;
             passwordMessage.className = data.success ? 'success' : 'error';
             
-            if (!data.success) return;   //STOP if password wrong
-            
+            if (!data.success)
+            {
+                return;   //STOP if password wrong
+            }
             // Load notes from backend
             await loadNotes();
             
@@ -119,6 +97,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             await saveUserNotesToDatabase();
             
+            const api_result = await fetch(API_URL + '/api/' + API_SCRIPT, {
+                method: 'POST',
+                headers: authHeaders(),
+                
+                //HTTP can only send strings through web... JSON.stringify my content
+                body: JSON.stringify({
+                    method_name: 'invalidateLoginSession',
+                    method_params: {},
+                })
+            });
+            
+            //const api_result_json = await api_result.json();
+            //console.log(api_result_json);
         }
         catch
         {
