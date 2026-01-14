@@ -36,6 +36,9 @@ function getTokenPayload()
     {
         return null;
     }
+    
+    validateTokenWithBackend();
+    
     try 
     {
         const base64Url = token.split('.')[1];
@@ -117,7 +120,7 @@ async function validateTokenWithBackend()
     
     try
     {
-        const res = await fetch(API_URL + '/api/backend_api_manager_for_github', {
+        const res = await fetch(API_URL + '/api/'  + API_SCRIPT, {
             method: 'POST',
             headers: authHeaders(),
             
