@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await loadNotes();
             
             //Generating encryption/decryption key
-            const salt = currentEmail; // simplest: unique per user
+            const salt = newEmail; // simplest: unique per user
                 
             const newMEK = await deriveMEK(userPassword, salt); // stays in memory throught the session
             
@@ -50,8 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await res.json();
             emailMessage.textContent = data.message;
             emailMessage.className = data.success ? 'success' : 'error';
-            
-            //if (!data.success) return;   //STOP if password wrong
             
         }
         catch
