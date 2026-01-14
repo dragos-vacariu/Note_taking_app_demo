@@ -37,7 +37,12 @@ function getTokenPayload()
         return null;
     }
     
-    validateTokenWithBackend();
+    const result = validateTokenWithBackend();
+    if (!result)
+    {
+        logoutUser();
+        return null;
+    }
     
     try 
     {
@@ -80,7 +85,8 @@ async function requireLogin()
     //Load the MEK
     MEK = await loadMEK();
 
-    if (!MEK) {
+    if (!MEK)
+    {
         alert("Encryption key missing. Please log in again.");
         sessionStorage.removeItem("jwt_token");
         return null;

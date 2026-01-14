@@ -101,3 +101,14 @@ async function getEncryptedNotes(MEK_Key)
     }
     return encrypted_notes;
 }
+
+// ---------------------------------------------------------
+// Function used to logout the user
+// ---------------------------------------------------------
+function logoutUser()
+{
+    localStorage.removeItem('jwt_token');
+    sessionStorage.removeItem('jwt_token');
+    sessionStorage.removeItem("MEK");
+    window.location.href = APP_LOCATION + '/frontend/login.html';
+}
