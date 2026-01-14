@@ -29,7 +29,7 @@ function getToken()
 // -------------------------------------------------------------------------------
 // Function that decodes the JWT payload
 // -------------------------------------------------------------------------------
-function getTokenPayload() 
+async function getTokenPayload() 
 {
     const token = getToken();
     if (!token)
@@ -37,7 +37,7 @@ function getTokenPayload()
         return null;
     }
     
-    const result = validateTokenWithBackend();
+    const result = await validateTokenWithBackend();
     if (!result)
     {
         logoutUser();
@@ -59,9 +59,9 @@ function getTokenPayload()
 // -------------------------------------------------------------------------------
 // Function that checks if the token looks valid (not expired)
 // -------------------------------------------------------------------------------
-function isLoggedIn() 
+async function isLoggedIn() 
 {
-    const payload = getTokenPayload();
+    const payload = await getTokenPayload();
     
     if (!payload)
     {
@@ -77,7 +77,7 @@ function isLoggedIn()
 // -------------------------------------------------------------------------------
 async function requireLogin() 
 {
-    const payload = getTokenPayload();
+    const payload = await getTokenPayload();
     if (!payload) {
         return null;
     }
@@ -136,7 +136,9 @@ async function validateTokenWithBackend()
                 method_params: {}
             })
         });
-        return res.ok;
+        
+        const data = await res.json();
+        return data.valid === true;
     }
     catch
     {
