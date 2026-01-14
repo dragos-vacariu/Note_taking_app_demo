@@ -368,6 +368,30 @@ async function saveEdit(e)
 // ---------------------------------------------------------
 async function addPost()
 {
+    /*Check if user's authentication is still valid*/
+    const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        
+        //HTTP can only send strings through web... JSON.stringify my content
+        body: JSON.stringify({
+            method_name: 'validateUserAuthenticationToken',
+            method_params: {}
+        })
+    });
+    if (!res.ok)
+    {
+        if (res.status === 401)
+        {
+            alert('Session expired. Please log in again.');
+            logoutUser();
+            return;
+        }
+    }
+    
     const newId = 'note-' + Date.now();
     const newNote = { id: newId, title: "New Note", content: "Add your content here..." };
     NOTES_CACHE.push(newNote);
