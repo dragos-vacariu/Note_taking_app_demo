@@ -49,10 +49,16 @@ async function verifyEmail(token)
         {
             messageEl.textContent = data.message;
             messageEl.classList.add('success');
-
+            
+            /*Removing tokens if any*/
+            localStorage.removeItem('jwt_token');
+            sessionStorage.removeItem('jwt_token');
+            sessionStorage.removeItem("MEK");
+            
             setTimeout(() => {
                 window.location.href = APP_LOCATION + '/frontend/login.html';
             }, 3000);
+            
         }
         
         else
