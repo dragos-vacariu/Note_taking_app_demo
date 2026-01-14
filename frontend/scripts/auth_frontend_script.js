@@ -18,14 +18,17 @@ if(PLATFORM.toLowerCase() == "github")
     API_SCRIPT = "backend_api_manager_for_github";
 }
 
-
-// Returns token from localStorage (persistent) or sessionStorage (session)
+// -------------------------------------------------------------------------------
+// Function that returns the token from localStorage (persistent) or sessionStorage (session)
+// -------------------------------------------------------------------------------
 function getToken()
 {
     return localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
 }
 
-// Decode JWT payload
+// -------------------------------------------------------------------------------
+// Function that decodes the JWT payload
+// -------------------------------------------------------------------------------
 function getTokenPayload() 
 {
     const token = getToken();
@@ -45,7 +48,9 @@ function getTokenPayload()
     }
 }
 
-// Checks if the token looks valid (not expired)
+// -------------------------------------------------------------------------------
+// Function that checks if the token looks valid (not expired)
+// -------------------------------------------------------------------------------
 function isLoggedIn() 
 {
     const payload = getTokenPayload();
@@ -59,7 +64,9 @@ function isLoggedIn()
     return !payload.exp || payload.exp > now;
 }
 
-// Must be called at page load to protect the page
+// -------------------------------------------------------------------------------
+// Function to be called at page load to protect the page
+// -------------------------------------------------------------------------------
 async function requireLogin() 
 {
     const payload = getTokenPayload();
@@ -79,7 +86,9 @@ async function requireLogin()
     return payload;
 }
 
-// Headers to use in fetch requests
+// -------------------------------------------------------------------------------
+// Function that returns the authentication headers to use in fetch requests
+// -------------------------------------------------------------------------------
 function authHeaders()
 {
     const token = getToken();
@@ -94,7 +103,9 @@ function authHeaders()
     };
 }
 
-// Optional: validate token with backend before using page
+// -------------------------------------------------------------------------------
+// Optional: Function used to validate token with backend before using page
+// -------------------------------------------------------------------------------
 async function validateTokenWithBackend()
 {
     const token = getToken();
@@ -124,7 +135,9 @@ async function validateTokenWithBackend()
     }
 }
 
-// Derive a 256-bit MEK from user's password
+// -------------------------------------------------------------------------------
+// Function used to derive a 256-bit MEK from user's password
+// -------------------------------------------------------------------------------
 async function deriveMEK(password, salt)
 {
     // Convert password & salt to ArrayBuffer
@@ -160,7 +173,9 @@ async function deriveMEK(password, salt)
 
     return MEK;
 }
-
+// -------------------------------------------------------------------------------
+// Function used to load MEK from the sessionStorage
+// -------------------------------------------------------------------------------
 async function loadMEK() 
 {
     const stored = sessionStorage.getItem("MEK");
@@ -177,64 +192,12 @@ async function loadMEK()
     );
 }
 
-async function loadNotes()
+// -------------------------------------------------------------------------------
+// Function used to store the MEK throughtout the session.
+// -------------------------------------------------------------------------------
+async function storeMEK(MEK)
 {
-    const user = await requireLogin();
-
-    if (!user)
-    {
-        window.location.href = APP_LOCATION + '/frontend/login.html';
-        return;
-    }
-
-    try
-    {
-        const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
-            method: 'POST',
-            headers: authHeaders(),
-            body: JSON.stringify({
-                method_name: 'getUserNotes',
-                method_params: {}
-            })
-        });
-
-        if (!res.ok)
-        {
-            if (res.status === 401)
-            {
-                alert('Session expired. Please log in again.');
-                logoutUser();
-                return;
-            }
-            throw new Error('Failed to load notes');
-        }
-
-        const data = await res.json();
-        if (!data || !data.notes)
-        {
-            return;
-        }
-        NOTES_CACHE = [];
-
-        for (const note of data.notes)
-        {
-            // Use await properly inside an async function
-            console.log("Decrypting Title: " + note.title);
-            let decryptedTitle = await decryptData(MEK, note.title);
-            console.log("Decrypting Content: " + note.content);
-            let decryptedContent = await decryptData(MEK, note.content);
-            
-            NOTES_CACHE.push({ id: note.id, title: decryptedTitle, content: decryptedContent });
-        }
-
-        console.log("Notes read: ", NOTES_CACHE);
-        // Optionally: render notes to UI
-        // NOTES_CACHE.forEach(note => addNoteToUI(note.decryptedTitle, note.decryptedContent, note.id));
-
-    }
-    catch (err)
-    {
-        console.error('Failed to load notes:', err);
-        alert('Failed to load notes');
-    }
+    const raw = await crypto.subtle.exportKey("raw", MEK);
+    const base64 = btoa(String.fromCharCode(...new Uint8Array(raw)));
+    sessionStorage.setItem("MEK", base64);
 }

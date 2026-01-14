@@ -71,15 +71,6 @@ async function generateMEK(password, salt) {
 }
 
 // -------------------------------------------------------------------------------
-// Function used to store the MEK throughtout the session.
-// -------------------------------------------------------------------------------
-async function storeMEK(MEK) {
-    const raw = await crypto.subtle.exportKey("raw", MEK);
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(raw)));
-    sessionStorage.setItem("MEK", base64);
-}
-
-// -------------------------------------------------------------------------------
 // Function used to generate a cryptographic key for encryption using MEK
 // -------------------------------------------------------------------------------
 async function importMEKKey(rawKey)

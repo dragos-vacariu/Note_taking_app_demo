@@ -36,6 +36,8 @@
                         <h3>Change Email</h3>
                         <label for="newEmail">New Email:</label>
                         <input type="email" id="newEmail" required />
+                        <label for="userPassword">Current Password:</label>
+                        <input type="password" id="userPassword" required />
                         <button type="submit" class="page_button">Update Email</button>
                         <div id="emailMessage"></div>
                     </form>
@@ -60,6 +62,8 @@
             <!--The content will be added from javascript-->
         </footer> 
         <!--The frontend script should be added/loaded at the end, because we need the div elements to exist in the document-->
+          <script src="./scripts/crypto_utils.js"></script>
+          <script src="./scripts/global_functions.js"></script>
           <script src="./scripts/settings_frontend_script.js"></script>
         <!--Global resources-->
         <script src="../../website_resources/global/scripts/global_script.js"></script>

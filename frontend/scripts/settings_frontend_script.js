@@ -7,18 +7,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     
-    const token = getToken();
     const emailForm = document.getElementById('updateEmailForm');
     const passwordForm = document.getElementById('updatePasswordForm');
     const emailMessage = document.getElementById('emailMessage');
     const passwordMessage = document.getElementById('passwordMessage');
-    const currentEmailEl = document.getElementById('currentEmail');
-
-    if (currentEmailEl) currentEmailEl.textContent = payload.user_email;
-
+    const currentEmail = payload.user_email;
+    
     // --- Change Email ---
     emailForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const userPassword = document.getElementById('userPassword').value.trim();
         const newEmail = document.getElementById('newEmail').value.trim();
         
         try
@@ -31,6 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 //HTTP can only send strings through web... JSON.stringify my content
                 body: JSON.stringify({
                     newEmail: newEmail,
+                    currentPassword: userPassword,
                     token: token,
                     method_name: 'updateUserSettings',
                     method_params: {}
@@ -39,6 +38,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await res.json();
             emailMessage.textContent = data.message;
             emailMessage.className = data.success ? 'success' : 'error';
+            
+            if (!data.success) return;   //STOP if password wrong
+            
+            // Load notes/decrypt from backend
+            await loadNotes();
+            
+            //Generating encryption/decryption key
+            const salt = currentEmail; // simplest: unique per user
+                
+            MEK = await deriveMEK(userPassword, salt); // stays in memory throught the session
+            await storeMEK(MEK);
+            
+            await saveUserNotesToDatabase();
         }
         catch
         {
@@ -61,7 +73,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        try {
+        try
+        {
             const token = getToken();
             const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
                 method: 'POST',
@@ -79,6 +92,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await res.json();
             passwordMessage.textContent = data.message;
             passwordMessage.className = data.success ? 'success' : 'error';
+            
+            if (!data.success) return;   //STOP if password wrong
+            
+            // Load notes from backend
+            await loadNotes();
+            
+            //Generating encryption/decryption key
+            const salt = currentEmail; // simplest: unique per user
+                
+            MEK = await deriveMEK(currentPassword, salt); // stays in memory throught the session
+            await storeMEK(MEK);
+            
+            await saveUserNotesToDatabase();
         }
         catch
         {

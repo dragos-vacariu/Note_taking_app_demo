@@ -318,39 +318,23 @@ async function saveEdit(e)
         const title = titleDiv.innerHTML;
         const content = contentDiv.innerHTML;
         
-        //Encrypting data:
-        console.log(MEK)
-        
         const idx = NOTES_CACHE.findIndex(n => n.id === noteId);
     
         if (idx !== -1)
         {
+            /*If note already exists in the database*/
             NOTES_CACHE[idx].title = title;
             NOTES_CACHE[idx].content = content;
         }
         
         else
         {
+            /*Add the note to database*/
             NOTES_CACHE.push({ id: noteId, title: title, content: content });
         }
         
-        const encryptedNotes = await getEncryptedNotes();
+        await saveUserNotesToDatabase();
         
-        fetch(API_URL + '/api/' + API_SCRIPT, {
-            method: 'POST',
-            headers: authHeaders(),
-            
-            //HTTP can only send strings through web... JSON.stringify my content
-            body: JSON.stringify({
-                notes: encryptedNotes,
-                method_name: 'saveUserNotes',
-                method_params: {}
-            })
-        })//no ; means the following .then/.catch will wait for the server response before executing
-            .then(res => res.json())
-            .then(() => showStatusMessage(entry_post, "Saved successfully!", 3000, "success"))
-            .catch(() => showStatusMessage(entry_post, "Server failure - note not saved!", 3000, "failure"));
-
         titleDiv.contentEditable = "false";
         titleDiv.style.border = "none";
         contentDiv.contentEditable = "false";
@@ -366,6 +350,7 @@ async function saveEdit(e)
         if(toggleDropdownButton)
         {
             toggleDropdownButton.innerText = '...';
+            
             toggleDropdownButton.onclick = function() {
                 toggleDropdown(e.currentTarget); 
             };
@@ -374,7 +359,6 @@ async function saveEdit(e)
     }
     else
     {
-        alert('');
         showStatusMessage(entry_post, "Error. Refresh and try again!", 3000, "failure")
     }
 }
@@ -382,7 +366,8 @@ async function saveEdit(e)
 // ---------------------------------------------------------
 // Function that triggers when the AddPost button is clicked
 // ---------------------------------------------------------
-async function addPost() {
+async function addPost()
+{
     const newId = 'note-' + Date.now();
     const newNote = { id: newId, title: "New Note", content: "Add your content here..." };
     NOTES_CACHE.push(newNote);
@@ -398,47 +383,15 @@ async function remove_entry(e)
     const noteId = entryDiv.dataset.id;
 
     const idx = NOTES_CACHE.findIndex(n => n.id === noteId);
-    if (idx !== -1) NOTES_CACHE.splice(idx, 1);
-    
-    const encryptedNotes = await getEncryptedNotes();
-    
-    fetch(API_URL + '/api/' + API_SCRIPT, {
-        method: 'POST',
-        headers: authHeaders(),
-        
-        //HTTP can only send strings through web... JSON.stringify my content
-        body: JSON.stringify({
-            notes: encryptedNotes,
-            method_name: 'saveUserNotes',
-            method_params: {}
-        })
-    })//no ; means the following .then/.catch will wait for the server response before executing
-        .then(res => res.json())
-        .then(() => {
-            alert('Note removed');
-            const journalled_content = document.getElementById('journalled_content');
-            journalled_content.removeChild(entryDiv);
-        })
-        .catch(() => {
-            alert('Failed to remove note')
-        });
-}
-
-async function getEncryptedNotes()
-{
-    let encrypted_notes = [];
-    
-    for (note of NOTES_CACHE)
+    if (idx !== -1)
     {
-        const encryptedTitle = await encryptData(MEK, note.title);
-        const encryptedContent = await encryptData(MEK, note.content);
-        encrypted_notes.push( {id: note.id, title: encryptedTitle, content: encryptedContent} );
+        NOTES_CACHE.splice(idx, 1);
     }
-    return encrypted_notes;
+    await saveUserNotesToDatabase();
 }
 
 // ---------------------------------------------------------
-// Show logged_user session
+// Function used to display logged_user session
 // ---------------------------------------------------------
 async function showLoggedUser()
 {
