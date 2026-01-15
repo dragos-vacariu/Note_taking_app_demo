@@ -3,3 +3,7 @@
     border: groove 2px rgba(0,0,0,0.1);
     min-height: 30vw;
 }
+
+#page_content header{
+    position: relative !important;
+}
