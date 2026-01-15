@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 localStorage.removeItem('jwt_token');
                 LogIn_SignUp();
             }
-        } 
+        }
         catch (err) 
         {
             console.error('Token validation failed:', err);
@@ -227,6 +227,10 @@ function LogIn_SignUp()
         
         try
         {
+            // Get the "Keep me logged in" checkbox value (if in login mode)
+            const rememberMeCheckbox = document.getElementById('rememberMe');
+            const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
+            
             const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -235,6 +239,7 @@ function LogIn_SignUp()
                 body: JSON.stringify({
                     user_email: user_email,
                     password: password,
+                    rememberMe: rememberMe,
                     method_name: endpoint_function,
                     method_params: {}
                 })
@@ -271,22 +276,12 @@ function LogIn_SignUp()
                 MEK = await deriveMEK(password, salt); // stays in memory throught the session
                 
                 await storeMEK(MEK);
-                
-                // Get the "Keep me logged in" checkbox value (if in login mode)
-                const rememberMeCheckbox = document.getElementById('rememberMe');
-                const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
 
                 const token = data.token;
 
-                // Save token to correct storage
-                if(rememberMe)
-                {
-                    localStorage.setItem('jwt_token', token);
-                } 
-                else
-                {
-                    sessionStorage.setItem('jwt_token', token);
-                }
+                // Save token to local storage for longterm use.
+                localStorage.setItem('jwt_token', token); //works with multitabs
+                sessionStorage.setItem('jwt_token', token); //sessionStorage only works with 1 tab.
 
                 messageDiv.style.color = 'green';
 
@@ -340,6 +335,10 @@ async function LogIn_AsGuest()
     
     try
     {
+        // Get the "Keep me logged in" checkbox value (if in login mode)
+        const rememberMeCheckbox = document.getElementById('rememberMe');
+        const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
+            
         const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -348,6 +347,7 @@ async function LogIn_AsGuest()
             body: JSON.stringify({
                 user_email: user_email,
                 password: password,
+                rememberMe: rememberMe,
                 method_name: "userLogin",
                 method_params: {}
             })
@@ -384,22 +384,12 @@ async function LogIn_AsGuest()
             MEK = await deriveMEK(password, salt); // stays in memory throught the session
             
             await storeMEK(MEK);
-            
-            // Get the "Keep me logged in" checkbox value (if in login mode)
-            const rememberMeCheckbox = document.getElementById('rememberMe');
-            const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : false;
 
             const token = data.token;
 
-            // Save token to correct storage
-            if(rememberMe)
-            {
-                localStorage.setItem('jwt_token', token);
-            } 
-            else
-            {
-                sessionStorage.setItem('jwt_token', token);
-            }
+            // Save token to local storage for longterm use.
+            localStorage.setItem('jwt_token', token); //works with multitabs
+            sessionStorage.setItem('jwt_token', token); //sessionStorage only works with 1 tab.
 
             messageDiv.style.color = 'green';
 

@@ -25,18 +25,90 @@
             <h2>Catalogue -> <a href={{fullstack_apps_page.value}}>{{fullstack_apps_page.name}}</a> -> Note Taking App</h2>
 
             <div id="app_page_content">
-                <div id="page_title">Note Taking App <sup>-> Home</sup></div>
-                <nav class="app-nav">
-                    <a href="./app.html" class="selected_link">🏠 Home</a>
-                    <a href="./settings.html">⚙️ Settings</a>
-                    <a href="./logout.html">⏻ Logout</a>
-                </nav>
-                <div id="menu">
-                    <div id="logged_user_info">Logged as: <span id="user_logged"></span></div>
-                    <button id="add_entry_button" class="page_button">Add Entry</button>
-                    <!--<button onclick = "savePage()">Export Page</button>-->
+                <div id="unlockModal" class="modal hidden">
+                <div class="modal-content">
+                    <h2>🔒 Unlock Your Vault</h2>
+                    <p>For security reasons, please re-enter your password to access your encrypted data.</p>
+
+                    <input type="password" id="unlockPassword" placeholder="Enter your password" />
+                
+                    <button id="unlockBtn">Unlock</button>
+                    <p id="unlockError" class="error"></p>
                 </div>
-                <div id = "journalled_content"></div>
+            </div>
+            <div id="page_content">
+                <header>
+                    <nav class="app-nav">
+                        <a href="/frontend/app.html" class="selected_link">🏠 Home</a>
+                        <a href="/frontend/settings.html">⚙️ Settings</a>
+                        <a href="/frontend/logout.html">⏻ Logout</a>
+                        
+                    </nav>
+                    <div id="menu">
+                        <div id="logged_user_info">Logged as: <span id="user_logged"></span></div>
+                        <button id="add_entry_button" class="page_button">Add Entry</button>
+                        <!--<button onclick = "savePage()">Export Page</button>-->
+                    </div>
+                </header>
+
+                <div id="page_layout">
+                    <div id="jour_navigation">
+                        <div id="sidebar_wrapper">
+                            <!-- Toggle button inside wrapper -->
+                            <button id="toggle_sidebar_button" class="sidebar_toggle">&lt;</button>
+
+                            <!-- Actual sidebar content -->
+                            <div id="sidebar_content">
+                                <!-- Search Section -->
+                                <div id="search_section">
+                                    <input type="text" id="search_input" placeholder="Search notes..." />
+                                    <select id="search_type">
+                                        <option value="contextual">Contextual Search</option>
+                                        <option value="match_words">Match Words</option>
+                                    </select>
+                                </div>
+
+                                <!-- Categories / Tags -->
+                                <div id="categories_section">
+                                    <strong>Categories / Tags</strong>
+                                    <div id="tag_buttons"></div>
+                                </div>
+
+                                <!-- Stats Section -->
+                                <div id="sidebar_stats">
+                                    <span id="total_notes">Notes: 0</span>
+                                    <span id="total_tags">Tags: 0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id = "journalled_content">
+                        
+                        <!--
+                        <div class = "jour_entry">
+                            <div class="postControls">
+                                <div class="dropdown">
+                                    <button onclick="toggleDropdown(this)">...</button>
+                                    <div id="myDropdown" class="dropdown-content">
+                                        <a href="#" onclick="toggleEdit.call(this)">Edit</a>
+                                        <a href="#" onclick="toggleEdit.call(this)">Remove</a>
+                                    </div>
+                                </div>
+                                <span id="statusInfo">
+                                </span>
+                            </div>
+                            <div class="jour_entry_title" contenteditable="false">First post title</div>
+                            <div class="jour_entry_content" contenteditable="false">
+                                First post content
+                            </div>
+                           
+                        </div>
+                        -->
+                        
+                    </div>
+                </div>
+            </div>
             </div>
         </div>
         <footer id="page_footer">

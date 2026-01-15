@@ -8,15 +8,10 @@ body
     background: var(--background-gradient);
 }
 
-#page_content #menu
-{
-    position:relative;
-    
-    display: inline-block;
-    border: none 1px blue;
-    width: 99%;
-    margin: 0% 0.5%;
-    
+/* Make all elements include padding/border in width */
+*,
+*::before,
+*::after {
     /*The following will ensure that the width of the element will not grow with the added border-size.
     So the border will be within the defined element width.
     */
@@ -25,9 +20,30 @@ body
     box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
-#journalled_content
-{
-    margin: 0.5%;
+#page_content {
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    /*height: 100vh;*/ /* full viewport height */
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #fff; /* or match your theme */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 8px 16px;
+}
+
+#menu {
+    display: flex;
+    justify-content: space-between; /* push items to edges */
+    align-items: center;            /* vertically center items */
+    gap: 12px;                      /* space between buttons if multiple */
+    padding: 0 16px;                /* optional padding */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 #logged_user_info{
@@ -44,16 +60,225 @@ body
     font-weight: bold;
 }
 
+#page_layout {
+    display: flex;
+    align-items: flex-start;   /* align sidebar & content to top */
+    width: 100%;
+    border: none 2px black;
+}
+
+/* LEFT NAVIGATION */
+
+
+#jour_navigation {
+    position: sticky;
+    top: 120px;            /* adjust for header height */
+    display: flex;
+    flex-direction: row;  /* sidebar + toggle button */
+    width: 250px;
+    align-items: flex-start;
+    height: 100%;         /* take full height of parent */
+    
+    border: none 2px green;
+    margin-right: 3px;
+}
+
+#sidebar_wrapper {
+    display: flex;
+    flex-direction: column;  /* stack sidebar + button vertically */
+    align-items: flex-start;
+    position: relative;      /* anchor for button if needed */
+    padding: 8px;
+}
+
+/* Sidebar content */
+#sidebar_content {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    gap: 12px;
+    background-color: #f7f7f7;
+
+    border: 1px solid #ddd;
+
+    max-height: 100vh;
+    overflow-y: auto;
+    order: 2; /* push below toggle button visually */
+}
+
+/* Toggle button stays at the top */
+.sidebar_toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 30px;
+    padding: 0px;
+    margin-bottom: 8px;
+    background-color: var(--blue-color) !important;
+    font: var(--button-font) !important;
+    font-weight: bold !important;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px !important;
+    z-index: 999;
+    order: 1; /* visually appears before sidebar */
+    align-self: flex-end; /* align to right */
+}
+
+/* Collapsed state */
+#jour_navigation.collapsed {
+    width: 24px; /* only the toggle button visible */
+}
+
+#jour_navigation.collapsed #sidebar_content {
+    display: none;  /* hide sidebar content */
+}
+
+#jour_navigation.collapsed .sidebar_toggle {
+    background-color: var(--blue-color);
+}
+
+
+
+/* Search Section */
+#search_section
+{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#search_input {
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#search_type {
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* Categories Section */
+#categories_section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#categories_section strong
+{
+    font: var(--post-content-font);
+    font-weight: bold;
+    color: var(--darkbrown-color);
+}
+
+#tag_buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* Tag buttons */
+.tag_button {
+    padding: 4px 8px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    background-color: #eee;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.tag_button:hover {
+    background-color: #ddd;
+}
+
+/* Stats Section */
+#sidebar_stats {
+    margin-top: auto; /* push stats to bottom */
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+/* RIGHT CONTENT AREA */
+#journalled_content {
+    flex-grow: 1;
+    padding: 8px;
+    overflow-y: visible; /* no independent scrolling */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+    align-items: start;
+    border: none 2px red;
+}
+
+/* Responsive: stack on small screens */
+@media (max-width: 768px) {
+    #page_layout {
+        flex-direction: column;  /* stack vertically */
+    }
+
+    #jour_navigation {
+        width: 100%;
+        height: auto;
+        position: relative;
+        top: 0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 8px;
+        gap: 8px;
+    }
+
+    #tag_buttons {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    #sidebar_stats {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    #journalled_content {
+        width: 100%;    /* take full width */
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* smaller min width for notes */
+    }
+}
+
+@media (max-width: 480px) {
+    #journalled_content {
+        padding: 8px;
+        grid-template-columns: 1fr;  /* single column of notes */
+    }
+}
+
 .jour_entry
 {
     position: relative;
-    overflow: hidden;
-    width: 100%;
-    margin:  10px 0px;
-    padding: 5px;
-    border: inset 1px rgba(0,0,0,0);
+    overflow: visible;
+    
+    width:100%;
+
+    padding: 8px;
+    margin: 10px auto;          /* gap handles spacing */
+    box-sizing: border-box;
+    
+    border: groove 1px rgba(0,0,0,0.1);
     border-radius: 0.5vw;
     background-color: var(--light-gray-color);
+}
+
+.jour_entry #jour_entry_title, .jour_entry #jour_entry_content, .jour_entry #text_editor_toolbar,
+.jour_entry #jour_entry_tags
+{
+    width: 98%;
+    margin: 2px 0px;
+    padding: 2px 15px;
+    
     /*The following will ensure that the width of the element will not grow with the added border-size.
     So the border will be within the defined element width.
     */
@@ -62,30 +287,108 @@ body
     box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
-.jour_entry #jour_entry_title, .jour_entry #jour_entry_content, .jour_entry #text_editor_toolbar 
+.collapseableDivs{
+    display: block;
+}
+
+.jour_entry #jour_entry_title, .jour_entry #jour_entry_content, .jour_entry #text_editor_toolbar,
+.jour_entry #jour_entry_tags
 {
-    width: 98%;
-    margin: 2px 0px;
-    padding: 0.5%;
+    border: groove 1px rgba(0,0,0,0.1);
+    border-radius: 5px;
+}
+
+.jour_entry #jour_entry_title[contenteditable="true"],
+.jour_entry #jour_entry_content[contenteditable="true"],
+.jour_entry #jour_entry_tags[contenteditable="true"] {
+    border: groove 2px rgba(200,0,0,0.7);
+    background-color: white;
+}
+
+.jour_entry #jour_entry_title, .jour_entry #jour_entry_content, .jour_entry #jour_entry_tags
+{
+    background-color: var(--light-gray-color);
 }
 
 .jour_entry #jour_entry_title
 {
-    background-color: var(--light-gray-color);
     font: var(--post-title-font);
     color: var(--darkblue-color);
-    border-radius: 1vw;
 }
 
 .jour_entry #jour_entry_content
 {
-    background-color: var(--light-gray-color);
     font: var(--post-content-font); 
     color: black;
-    field-sizing: content;
-
-    border-radius: 1vw;
 }
+
+.jour_entry #jour_entry_tags
+{
+    margin-top: 3px;
+    font: var(--post-content-font);
+    color: rgba(100,100,100,0.5);
+}
+
+/* Style the truncated elements */
+.truncated_entries
+{
+    display: -webkit-box;
+    -webkit-line-clamp: 10; /* show only 5 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Style the truncated elements */
+.edit_mode
+{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.edit_mode .jour_entry {
+    width: 80%;
+    max-width: 800px;
+    max-height: 85vh;
+
+    overflow-y: auto;
+    padding: 20px;
+
+    border-radius: 12px;
+    background-color: #fff;
+
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+/* Style the button for Show More/Show Less */
+#show_more_button, #save_button {
+    display: inline-block;
+    margin-top: 0.5em;
+    padding: 0.35em 1em;
+    border: none;
+    background-color: var(--blue-color);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#show_more_button{
+    border-radius: 25px;
+}
+
+#save_button{
+    border-radius: 10px;
+}
+
+#show_more_button:hover, #save_button:hover {
+    opacity: 0.5;
+    transform: translateY(-2px);
+} 
 
 #postControls {
     display: flex;

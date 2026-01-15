@@ -1,12 +1,18 @@
-const enabledEditableDivBorderStyle = "inset 1px rgba(0,0,0,0.5)";
 
 window.onload = async function() 
 {
-    // Load notes from backend
-    await loadNotes();
+    const payload = await requireLogin(); // local JWT validation
     
+    if(!payload)
+    {
+        return
+    }
+    
+    // Load notes from backend
+    await loadNotes(payload);
+
     // Show logged user info
-    await showLoggedUser();
+    await showLoggedUser(payload);
     
     // Load notes from backend
     await displayNotes();
@@ -29,52 +35,61 @@ window.onload = async function()
 // ---------------------------------------------------------
 async function displayNotes()
 {   
-    console.log(NOTES_CACHE);
+    //console.log(NOTES_CACHE);
+    const tags = new Set(); // Use a Set to avoid duplicates
     for (const note of NOTES_CACHE)
     {
-        await addNoteToUI(note.title, note.content, note.id);
+        await addNoteToUI(note.title, note.content, note.tags, note.id);
+
+        if (note.tags)
+        {
+            const noteTagList = note.tags.split(" "); // array of tags
+            noteTagList.forEach(tag => {
+                if (tag.trim()) { // avoid empty strings
+                    tags.add(tag);
+                }
+            });
+        }
     }
+    truncatedContentHandling(); // attach click handler
+    populateTags(tags);
+    updateNotesCount(NOTES_CACHE.length);
 }
 
 // ---------------------------------------------------------
 // Function triggered when the Edit option is clicked from the 
 // context menu button
 // ---------------------------------------------------------
-function toggleEdit()
+function toggleEdit(e)
 {
-    const dropdownContent = this.closest('.dropdown').querySelector('.dropdown-content');
+    e.preventDefault(); // <- important if this is triggered by an <a>
+    //it prevents scrolling to the top of the page after click
+    
+    const dropdownContent = e.currentTarget.closest('.dropdown').querySelector('.dropdown-content');
     
     if (dropdownContent)
     {
         dropdownContent.classList.remove('show');
     }
     
-    const entry_post = this.closest('.jour_entry');
-
-    // Enable editing
-    const toggleDropdownButton = entry_post.querySelector('#dropbtn');
-    
-    if(toggleDropdownButton)
-    {
-        toggleDropdownButton.textContent = "Post";
-        toggleDropdownButton.onclick = async (e) => {
-          await saveEdit(e);
-          // other code after async operation completes
-        };
-    }
+    const entry_post = e.currentTarget.closest('.jour_entry');
     
     const titleDiv = entry_post.querySelector("#jour_entry_title");
     if(titleDiv)
     {
         titleDiv.contentEditable = "true";
-        titleDiv.style.border = enabledEditableDivBorderStyle;
     }
     
     const contentDiv = entry_post.querySelector("#jour_entry_content");
     if(contentDiv)
     {
         contentDiv.contentEditable = "true";
-        contentDiv.style.border = enabledEditableDivBorderStyle;
+    }
+        
+    const tagsDiv = entry_post.querySelector("#jour_entry_tags");
+    if(tagsDiv)
+    {
+        tagsDiv.contentEditable = "true";
     }
     
     const toolbar = entry_post.querySelector("#text_editor_toolbar");
@@ -82,6 +97,24 @@ function toggleEdit()
     {
         toolbar.style.display = "inline-block";
     }
+    
+    // Display the save button
+    const saveButton = entry_post.querySelector("#save_button");
+    saveButton.style.display = 'block';
+    
+    
+    const truncatedElement = entry_post.querySelector(".truncated_entries");
+
+    //If the entry is truncated... show the full content during edit mode
+    if(truncatedElement != null)
+    {
+        truncatedElement.classList.remove("truncated_entries");
+        const showMoreButton = entry_post.querySelector("#show_more_button");
+        
+        //Hide the showMore button
+        showMoreButton.style.display = "none";
+    }
+    enterEditMode(entry_post);
 }
 
 function toggleDropdown(button)
@@ -97,12 +130,17 @@ function toggleDropdown(button)
 // ---------------------------------------------------------
 // Function used to add a Note to the UI/Web Page
 // ---------------------------------------------------------
-async function addNoteToUI(title, content, id, edit_mode=false) 
+async function addNoteToUI(title, content, tags, id, edit_mode=false) 
 {
     //CREATING A POST
     const entryDiv = document.createElement('div');
     entryDiv.className = 'jour_entry';
     entryDiv.dataset.id = id;
+    entryDiv.draggable = "true";
+    
+    const collapsableContent = document.createElement('div');
+    collapsableContent.id = "collapseableDiv";
+    //collapsableContent.classList.add("truncated_entries");
     
     //============================================================
     //ADDING BUTTONS AND FORM ELEMENTS
@@ -137,8 +175,8 @@ async function addNoteToUI(title, content, id, edit_mode=false)
     editBtn.href = '#';
     editBtn.id = 'editButton';
 
-    editBtn.onclick = function() {
-        toggleEdit.call(this); 
+    editBtn.onclick = function(e) {
+        toggleEdit(e); 
     };
     dropdownContentDiv.appendChild(editBtn);
 
@@ -164,24 +202,85 @@ async function addNoteToUI(title, content, id, edit_mode=false)
     contentDiv.contentEditable = false;
     
     // simulate "5 rows"
-    contentDiv.style.minHeight = '10em';  // 1em ≈ 1 line of text
-    contentDiv.style.lineHeight = '1em'; // make each line roughly 1em
+    //contentDiv.style.minHeight = '10em';  // 1em ≈ 1 line of text
+    //contentDiv.style.lineHeight = '1em'; // make each line roughly 1em
     contentDiv.style.whiteSpace = 'pre-wrap'; // respect line breaks
     
     const toolbar = createToolbar();
     toolbar.style.display = "none";
     
+    const tagsDiv = document.createElement('div');
+    tagsDiv.id = 'jour_entry_tags';
+    
+    if(tags)
+    {
+        let formatted_tags = "#" + tags.replaceAll(" ", ", #");
+    
+        tagsDiv.innerHTML = formatted_tags;
+    }
+    else
+    {
+        tagsDiv.innerHTML = "#";
+    }
+    tagsDiv.contentEditable = false;
+    
+    collapsableContent.appendChild(titleDiv);
+    collapsableContent.appendChild(toolbar);
+    collapsableContent.appendChild(contentDiv);
+    collapsableContent.appendChild(tagsDiv);
+    
+    // Create the button save button
+    const saveButton = document.createElement('button');
+    saveButton.id = 'save_button';
+    saveButton.textContent = 'Save';
+    saveButton.style.display = 'none';
+    saveButton.onclick = async (e) => {
+      await saveEdit(e);
+      // other code after async operation completes
+    };
+    entryDiv.appendChild(saveButton);
+    
     entryDiv.appendChild(postControls);
-    entryDiv.appendChild(titleDiv);
-    entryDiv.appendChild(toolbar);
-    entryDiv.appendChild(contentDiv);
-
+    entryDiv.appendChild(collapsableContent);
+    entryDiv.appendChild(saveButton);
+    
+    // Create the button showMoreButton
+    const showMoreButton = document.createElement('button');
+    showMoreButton.id = 'show_more_button';
+    showMoreButton.textContent = 'Show More';
+    showMoreButton.style.display = 'none';
+    entryDiv.appendChild(showMoreButton);
+    
     const journalled_content = document.getElementById('journalled_content');
     journalled_content.insertBefore(entryDiv, journalled_content.firstChild);
-
+    
+    // --- NOW the entryDiv element is in the DOM and we can measure the scrollHeight---
+    
+    checkAddTruncationToEntry(collapsableContent, showMoreButton);
+    
     if (edit_mode)
     {
         editBtn.onclick();
+    }
+}
+
+function checkAddTruncationToEntry(collapsableContent, showMoreButton)
+{
+    // Measure full height
+    const fullHeight = collapsableContent.scrollHeight;
+
+    // Measure truncated height
+    collapsableContent.classList.add("truncated_entries");
+    const truncatedHeight = collapsableContent.clientHeight;
+
+    // Decide if truncation is needed
+    if (fullHeight > truncatedHeight)
+    {
+        showMoreButton.style.display = "inline-block";
+    }
+    else
+    {
+        collapsableContent.classList.remove("truncated_entries");
     }
 }
 
@@ -207,7 +306,8 @@ function createToolbar()
         return btn;
     };
     
-    // Basic formatting buttons
+    
+    toolbar.appendChild(addButton('<b>Tx</b>', 'removeFormat', "Clear formatting"));
     toolbar.appendChild(addButton('<b>B</b>', 'bold', "bold font"));
     toolbar.appendChild(addButton('<i>I</i>', 'italic', "italic font"));
     toolbar.appendChild(addButton('<u>U</u>', 'underline', "underline font"));
@@ -308,7 +408,11 @@ async function saveEdit(e)
     
     const titleDiv = entry_post.querySelector("#jour_entry_title");
     const contentDiv = entry_post.querySelector("#jour_entry_content");
+    const tagsDiv = entry_post.querySelector("#jour_entry_tags");
+    const collapsableDiv = entry_post.querySelector("#collapseableDiv");
     const toolbar = entry_post.querySelector("#text_editor_toolbar");
+    const saveButton = entry_post.querySelector("#save_button");
+    const showMoreButton = entry_post.querySelector("#show_more_button");
         
     if(titleDiv && contentDiv)
     {
@@ -317,6 +421,12 @@ async function saveEdit(e)
         
         const title = titleDiv.innerHTML;
         const content = contentDiv.innerHTML;
+        let unformatted_tags = tagsDiv.innerHTML;
+        unformatted_tags = unformatted_tags.trim();
+        unformatted_tags = unformatted_tags.replaceAll("#", "");
+        unformatted_tags = unformatted_tags.replaceAll(",", "");
+        const tags = unformatted_tags;
+        tagsDiv.innerHTML = "#" + tags.replaceAll(" ", ", #");
         
         const idx = NOTES_CACHE.findIndex(n => n.id === noteId);
     
@@ -325,12 +435,13 @@ async function saveEdit(e)
             /*If note already exists in the database*/
             NOTES_CACHE[idx].title = title;
             NOTES_CACHE[idx].content = content;
+            NOTES_CACHE[idx].tags = tags;
         }
         
         else
         {
             /*Add the note to database*/
-            NOTES_CACHE.push({ id: noteId, title: title, content: content });
+            NOTES_CACHE.push({ id: noteId, title: title, content: content, tags: tags });
         }
         
         let result = await saveUserNotesToDatabase();
@@ -343,32 +454,59 @@ async function saveEdit(e)
         {
             showStatusMessage(entry_post, "Server failure - changes not saved!", 3000, "failure");
         }
+        
         titleDiv.contentEditable = "false";
-        titleDiv.style.border = "none";
         contentDiv.contentEditable = "false";
-        contentDiv.style.border = "none";
+        tagsDiv.contentEditable = "false";
         
         if(toolbar)
         {
             toolbar.style.display = "none";
         }
 
-        //display the edit once again
-        const toggleDropdownButton = entry_post.querySelector('#dropbtn');
-        if(toggleDropdownButton)
-        {
-            toggleDropdownButton.innerText = '...';
-            
-            toggleDropdownButton.onclick = function() {
-                toggleDropdown(e.currentTarget); 
-            };
-        }
+        //Hide the button back after the content was saved
+        saveButton.style.display = 'none';
         
+        //Add truncation if needed
+        checkAddTruncationToEntry(collapsableDiv, showMoreButton);
+        entry_post.classList.remove("edit_mode");
+        exitEditMode(entry_post);
     }
     else
     {
         showStatusMessage(entry_post, "Error. Refresh and try again!", 3000, "failure");
     }
+}
+
+function enterEditMode(entry)
+{
+    const overlay = document.createElement("div");
+    overlay.className = "edit_mode";
+    
+    // Save original position
+    entry._originalParent = entry.parentNode;
+    entry._originalNext = entry.nextSibling;
+    
+    entry.draggable = false;
+    overlay.appendChild(entry);
+    document.body.appendChild(overlay);
+}
+
+function exitEditMode(entry)
+{
+    const parent = entry._originalParent;
+    const next = entry._originalNext;
+
+    if (next)
+    {
+        parent.insertBefore(entry, next);
+    }
+    else
+    {
+        parent.appendChild(entry);
+    }
+    entry.draggable = true;
+    document.querySelector(".edit_mode").remove();
 }
 
 // ---------------------------------------------------------
@@ -389,20 +527,13 @@ async function addPost()
     });
     if (!res.ok)
     {
-        if (res.status === 401)
-        {
-            alert('1.Session expired. Please log in again.');
-            //logoutUser();
-            return;
-        }
         alert('Server error. No response.');
-        return;
     }
     
     const newId = 'note-' + Date.now();
-    const newNote = { id: newId, title: "New Note", content: "Add your content here..." };
+    const newNote = { id: newId, title: "New Note", content: "Add your content here...", tags: "" };
     NOTES_CACHE.push(newNote);
-    await addNoteToUI(newNote.title, newNote.content, newNote.id, true);
+    await addNoteToUI(newNote.title, newNote.content, newNote.id, newNote.tags, true);
 }
 
 // ---------------------------------------------------------
@@ -424,11 +555,126 @@ async function remove_entry(e)
 // ---------------------------------------------------------
 // Function used to display logged_user session
 // ---------------------------------------------------------
-async function showLoggedUser()
+async function showLoggedUser(payload)
 {
-    const payload = await requireLogin(); // ensures user is logged in
     const userInfo = document.getElementById('user_logged');
 
     const userEmail = payload.user_email || payload.username;
     userInfo.textContent = `${userEmail}`;
 }
+
+function truncatedContentHandling()
+{
+    const divs = document.getElementsByClassName("jour_entry");
+    if(divs)
+    {
+        for (let index = 0; index < divs.length; index++)
+        {
+                const para = divs[index]; // single element
+                const toggle_button = para.querySelector("#show_more_button");
+                
+                if(toggle_button)
+                {
+                    toggle_button.addEventListener("click", 
+                           (e) => {showMoreLessToggleButton(e.currentTarget) } );
+                }
+        }
+
+        function showMoreLessToggleButton(btn)
+        {
+            const content = btn.parentElement.querySelector("#collapseableDiv");
+            if(content)
+            {
+                if (content.classList.contains("truncated_entries"))
+                {
+                    content.classList.remove("truncated_entries");
+                    btn.textContent = "See Less";
+                }
+                else
+                {
+                    content.classList.add("truncated_entries");
+                    btn.textContent = "Show More";
+                }
+            }
+            
+        }
+    }
+}
+
+function updateNotesCount(count) {
+    document.getElementById("total_notes").textContent = `Notes: ${count}`;
+}
+
+function populateTags(tags)
+{
+    const tagContainer = document.getElementById("tag_buttons");
+    tagContainer.innerHTML = ""; // clear existing
+    tags.forEach(tag => {
+        const btn = document.createElement("button");
+        btn.className = "tag_button";
+        btn.dataset.tag = tag;
+        btn.textContent = `#${tag}`;
+        btn.addEventListener("click", () => filterNotesByTag(tag));
+        tagContainer.appendChild(btn);
+    });
+
+    // Update total tags
+    document.getElementById("total_tags").textContent = `Tags: ${tags.size}`;
+}
+
+function toggleSidebar()
+{
+    sidebar.classList.toggle("collapsed");
+
+    // Optional: change arrow direction
+    if (sidebar.classList.contains("collapsed"))
+    {
+        toggleButton.textContent = ">";
+    }
+    else
+    {
+        toggleButton.textContent = "<";
+    }
+}
+
+function addDraggingBehavior()
+{
+    //Draggable logic
+    let draggedItem = null;
+
+    document.addEventListener("dragstart", e => {
+        if (e.target.classList.contains("jour_entry")) {
+            draggedItem = e.target;
+            e.target.style.opacity = "0.5";
+        }
+    });
+
+    document.addEventListener("dragend", () => {
+        if (draggedItem) draggedItem.style.opacity = "1";
+        draggedItem = null;
+    });
+
+    document.addEventListener("dragover", e => {
+        e.preventDefault(); // allow dropping
+    });
+
+    document.addEventListener("drop", e => {
+        const target = e.target.closest(".jour_entry");
+        if (!target || target === draggedItem) return;
+
+        const container = document.getElementById("journalled_content");
+
+        // Insert before the item you dropped on
+        container.insertBefore(draggedItem, target);
+    });
+}
+
+//Add toggleSidebar button handler
+const sidebar = document.getElementById("jour_navigation");
+const toggleButton = document.getElementById("toggle_sidebar_button");
+
+toggleButton.addEventListener("click", () => {
+    toggleSidebar();
+});
+
+addDraggingBehavior();

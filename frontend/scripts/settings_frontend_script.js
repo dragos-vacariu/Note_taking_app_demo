@@ -1,9 +1,16 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const payload = await requireLogin(); // local JWT validation
+    let payload = await requireLogin(); // local JWT validation
     
     if (!payload)
     {
         // redirects to login if missing/expired
+        return;
+    }
+    
+    let passwordRequired;
+    passwordRequired = await requirePassword();
+    if(passwordRequired)
+    {
         return;
     }
     
@@ -21,7 +28,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         try
         {
-            const token = getToken();
+            let token = getToken();
+            if(!token)
+            {
+                alert("Token not found. Please log in again.")
+                throw new Error('No token found');
+                logoutUser();
+            }
             
             const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
                 method: 'POST',
@@ -31,7 +44,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: JSON.stringify({
                     newEmail: newEmail,
                     currentPassword: userPassword,
-                    token: token,
                     method_name: 'updateUserSettings',
                     method_params: {}
                 })
@@ -64,7 +76,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try
         {
-            const token = getToken();
+            let token = getToken();
+            if(!token)
+            {
+                alert("Token not found. Please log in again.")
+                throw new Error('No token found');
+                logoutUser();
+            }
             const res = await fetch(API_URL + '/api/' + API_SCRIPT, {
                 method: 'POST',
                 headers: authHeaders(),
@@ -73,47 +91,59 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: JSON.stringify({
                     currentPassword: currentPassword,
                     newPassword: newPassword,
-                    token: token,
                     method_name: 'updateUserSettings',
                     method_params: {}
                 })
             });
             const data = await res.json();
-            passwordMessage.textContent = data.message;
-            passwordMessage.className = data.success ? 'success' : 'error';
             
             if (!data.success)
             {
                 return;   //STOP if password wrong
             }
+            
+            if(data.token)
+            {
+                token = data.token;
+                // Save token to local storage for longterm use.
+                localStorage.setItem('jwt_token', token); //works with multitabs
+                sessionStorage.setItem('jwt_token', token); //sessionStorage only works with 1 tab.
+                
+                console.log("Token changed: " + token);
+                
+                payload = await getTokenPayload();
+    
+                if (!payload)
+                {
+                    return null;
+                }
+            }
+            
+            passwordMessage.textContent = "PLEASE WAIT. DO NOT CLOSE/REFRESH THE PAGE.";
+            passwordMessage.className = 'warning';
+            
             // Load notes from backend
-            await loadNotes();
+            await loadNotes(payload);
             
             //Generating encryption/decryption key
             const salt = currentEmail; // simplest: unique per user
-                
+            
             MEK = await deriveMEK(newPassword, salt); // stays in memory throught the session
             await storeMEK(MEK);
             
             await saveUserNotesToDatabase();
             
-            const api_result = await fetch(API_URL + '/api/' + API_SCRIPT, {
-                method: 'POST',
-                headers: authHeaders(),
-                
-                //HTTP can only send strings through web... JSON.stringify my content
-                body: JSON.stringify({
-                    method_name: 'invalidateLoginSession',
-                    method_params: {},
-                })
-            });
+            /*Cleaning the fields.*/
+            document.getElementById('currentPassword').value = "";
+            document.getElementById('newPassword').value = "";
+            document.getElementById('confirmPassword').value = "";
             
-            //const api_result_json = await api_result.json();
-            //console.log(api_result_json);
+            passwordMessage.textContent = data.message;
+            passwordMessage.className = data.success ? 'success' : 'error';
         }
         catch
         {
-            passwordMessage.textContent = 'Network error';
+            passwordMessage.textContent = 'Error occured while changing the password.';
             passwordMessage.className = 'error';
         }
     });
