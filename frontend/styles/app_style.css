@@ -149,8 +149,6 @@ header {
     background-color: var(--blue-color);
 }
 
-
-
 /* Search Section */
 #search_section
 {
@@ -164,8 +162,6 @@ header {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
-
-
 
 #search_type {
     padding: 4px 8px;
@@ -244,20 +240,16 @@ header {
     color: #555;
 }
 
-#jour_container{
-
-}
-
 .add_fab {
-    position: fixed;
+    position: sticky;
     bottom: 20px;
-    right: 20px;
+    margin-left: auto;
+    margin-right: 20px;
 
     width: 56px;
     height: 56px;
     border-radius: 50%;
     font-size: 28px;
-    font-weight: bold;
 
     display: flex;
     justify-content: center;
