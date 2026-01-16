@@ -2,7 +2,8 @@
 {
     position:relative;
     overflow:hidden !important;
-    background-color: var(--light-gray-color);
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+    /*background-color: var(--light-gray-color);*/
     height: auto;
     min-height: 30vw;
 }
