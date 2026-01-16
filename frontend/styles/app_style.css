@@ -189,7 +189,8 @@ header {
     gap: 6px;
 }
 
-#clear_search_button{
+
+#clear_search_button, .sidebar_controls{
     padding: 4px;
     border-radius: 4px;
     cursor: pointer;
@@ -199,6 +200,28 @@ header {
     border-radius: 5px;
     color: var(--blue-color);
     background-color: #fff;
+}
+
+#sidebar_control_buttons{
+    display: flex;
+    gap: 30px;
+}
+
+.drag-handle {
+    cursor: grab;            /* Shows a hand for dragging */
+    user-select: none;        /* Prevent selecting the handle text */
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    color: var(--blue-color);
+    font-weight: bold;
+}
+
+.sidebar_controls{
+    width: 30px;
 }
 
 /* Tag buttons */
@@ -215,7 +238,7 @@ header {
     overflow-wrap: anywhere;
 }
 
-.tag_button:hover, #clear_search_button:hover {
+.tag_button:hover, #clear_search_button:hover, .sidebar_controls:hover {
     background-color: #ddd;
 }
 
@@ -228,8 +251,12 @@ header {
     background-color: #00d;
 }
 
-.selection_controls{
-    padding: 4px !important;
+.sidebar_controls{
+    padding: 2px !important;
+}
+
+.sidebar_controls {
+    transition: border 0.2s ease;
 }
 
 /* Stats Section */
@@ -560,7 +587,7 @@ header {
     margin: 0.5% 1%;
 }
 
-.dropdown #dropbtn, #close_button, #copy_clipboard
+.dropdown #dropbtn, #close_button, #copy_clipboard, #dragHandleButton
 {
     border: none 1px #ccc;
     color: var(--blue-color);
@@ -578,7 +605,7 @@ header {
     /*text-orientation: mixed;*/ /* ensures proper orientation for characters */
 }
 
-.dropdown #dropbtn:hover, #close_button:hover, #copy_clipboard:hover
+.dropdown #dropbtn:hover, #close_button:hover, #copy_clipboard:hover, #dragHandleButton:hover
 {
     background-color: #00d;
     color: white;
@@ -592,7 +619,10 @@ header {
     min-width: 100px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
-    right: 0%;
+    
+    /*centering the content with respect to the parent element*/
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 /* Style for each menu item */

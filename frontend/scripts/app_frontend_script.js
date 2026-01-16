@@ -1,5 +1,6 @@
 let activeTags = [];
 let visibleNotes = [];
+let areEntriesExpanded = false;
 
 window.onload = async function() 
 {
@@ -103,7 +104,6 @@ async function addNoteToUI(title, content, tags, id)
     const entryDiv = document.createElement('div');
     entryDiv.className = 'jour_entry';
     entryDiv.dataset.id = id;
-    entryDiv.draggable = "true";
     
     const collapsableContent = document.createElement('div');
     collapsableContent.id = "collapseableDiv";
@@ -145,6 +145,14 @@ async function addNoteToUI(title, content, tags, id)
     };
     postControls.appendChild(copyClipboard);
     
+    const dragHandle = document.createElement('button');
+    dragHandle.id = 'dragHandleButton';
+    dragHandle.className = 'drag-handle';
+    dragHandle.innerText = '✥';
+    dragHandle.draggable = true;
+    dragHandle.title = 'Drag & Drop Handler';
+    postControls.appendChild(dragHandle);
+    
     const statusInfo = document.createElement('span');
     statusInfo.id = 'statusInfo';
     statusInfo.innerText = 'status';
@@ -166,7 +174,7 @@ async function addNoteToUI(title, content, tags, id)
     dropdownContentDiv.appendChild(editBtn);
     
     const saveTxtFile = document.createElement('a');
-    saveTxtFile.innerText = 'Save';
+    saveTxtFile.innerText = 'Save .txt';
     saveTxtFile.href = '#';
     saveTxtFile.id = 'saveAsText';
 
@@ -564,7 +572,6 @@ function enterEditMode(entry_post)
     entry_post._originalParent = entry_post.parentNode;
     entry_post._originalNext = entry_post.nextSibling;
     
-    entry_post.draggable = false;
     overlay.appendChild(entry_post);
     document.body.appendChild(overlay);
 
@@ -595,7 +602,6 @@ function exitEditMode(entry_post)
     {
         parent.appendChild(entry_post);
     }
-    entry_post.draggable = true;
     document.querySelector(".edit_mode").remove();
     
     //Hide the button back after the content was saved
@@ -839,15 +845,21 @@ function toggleSidebar()
     }
 }
 
+//Defining dragging behaviors
 function addDraggingBehavior()
 {
-    //Draggable logic
     let draggedItem = null;
 
     document.addEventListener("dragstart", e => {
-        if (e.target.classList.contains("jour_entry")) {
-            draggedItem = e.target;
-            e.target.style.opacity = "0.5";
+        // Only start dragging if the drag handle is used
+        if (e.target.classList.contains("drag-handle"))
+        {
+            draggedItem = e.target.closest(".jour_entry");
+            draggedItem.style.opacity = "0.5";
+        }
+        else
+        {
+            e.preventDefault(); // prevent accidental drag
         }
     });
 
@@ -862,8 +874,10 @@ function addDraggingBehavior()
 
     document.addEventListener("drop", e => {
         const target = e.target.closest(".jour_entry");
-        if (!target || target === draggedItem) return;
-
+        if (!target || target === draggedItem)
+        {
+            return;
+        }
         const container = document.getElementById("journalled_content");
 
         // Insert before the item you dropped on
@@ -1035,7 +1049,6 @@ function copyToClipboard(e)
         });
 }
 
-
 function saveTextAsFile(e)
 {
     const entry_post = e.target.closest(".jour_entry");
@@ -1066,6 +1079,39 @@ function saveTextAsFile(e)
     URL.revokeObjectURL(url);
 }
 
+function expandCollapseAllEntries()
+{
+    const entries = Array.from(document.querySelectorAll(".jour_entry #collapseableDiv"));
+    
+    for (let entry of entries)
+    {
+        const showMoreButton = entry.closest(".jour_entry").querySelector("#show_more_button");
+        if (areEntriesExpanded)
+        {
+            checkAddTruncationToEntry(entry, showMoreButton);
+        }
+        else
+        {
+            entry.classList.remove("truncated_entries"); // expand
+            if(showMoreButton)
+            {
+                showMoreButton.style.display = "none";
+            }
+        }
+    }
+
+    areEntriesExpanded = !areEntriesExpanded; // toggle state
+    
+    if(areEntriesExpanded)
+    {
+        expandCollapseAllButton.innerText = "▼"
+    }
+    else
+    {
+        expandCollapseAllButton.innerText = "►"
+    }
+}
+
 //Add dropdown handler: If dropdown content is displayed hide the content when clicking outside of it
 document.addEventListener("click", function (e) {
     const dropdowns = document.querySelectorAll(".dropdown-content");
@@ -1078,6 +1124,35 @@ document.addEventListener("click", function (e) {
         }
     });
 });
+
+//Add listViewButton action handler
+const listViewButton = document.getElementById("listViewToggle");
+
+listViewButton.addEventListener("click", function() {
+    const jour = document.getElementById("journalled_content");
+    jour.style.display = "block";
+    listViewButton.style.borderColor = "var(--blue-color)";
+    gridViewButton.style.borderColor = "#aaa";
+});
+
+//Add gridViewButton action handler
+const gridViewButton = document.getElementById("gridViewToggle");
+
+gridViewButton.addEventListener("click", function() {
+    const jour = document.getElementById("journalled_content");
+    jour.style.display = "grid";
+    gridViewButton.style.borderColor = "var(--blue-color)";
+    listViewButton.style.borderColor = "#aaa";
+});
+
+if(getComputedStyle(document.getElementById("journalled_content")).display == "grid")
+{
+    gridViewButton.style.borderColor = "var(--blue-color)";
+}
+else
+{
+    listViewButton.style.borderColor = "var(--blue-color)";
+}
 
 //Add search_box
 const searchInput = document.getElementById("search_input");
@@ -1121,4 +1196,13 @@ deselectAllButton.addEventListener("click", async () => {
     await deselectAllElements();
 });
 
+//Add expandCollapseAll button behaviors
+
+expandCollapseAllButton = document.getElementById("expandCollapseAll");
+
+expandCollapseAllButton.addEventListener("click", () => {
+    expandCollapseAllEntries();
+});
+
+//Add dragging handler
 addDraggingBehavior();
