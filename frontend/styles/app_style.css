@@ -242,8 +242,8 @@ header {
 }
 
 .add_fab {
-    position: sticky;
-    bottom: 20px;
+    position: sticky !important;
+    bottom: 20px !important;
     margin-left: auto;
     margin-right: 20px;
 
