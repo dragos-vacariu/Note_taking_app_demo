@@ -1,3 +1,5 @@
+let activeTags = [];
+let visibleNotes = [];
 
 window.onload = async function() 
 {
@@ -40,12 +42,17 @@ async function displayNotes()
     for (const note of NOTES_CACHE)
     {
         await addNoteToUI(note.title, note.content, note.tags, note.id);
-
+        if(visibleNotes.includes(note.id) == false)
+        {
+            visibleNotes.push(note.id)
+        }
         if (note.tags)
         {
             const noteTagList = note.tags.split(" "); // array of tags
             noteTagList.forEach(tag => {
-                if (tag.trim()) { // avoid empty strings
+                if (tag.trim())
+                { // avoid empty strings
+                    activeTags.push(tag); //all tags are active by default
                     tags.add(tag);
                 }
             });
@@ -74,46 +81,6 @@ function toggleEdit(e)
     
     const entry_post = e.currentTarget.closest('.jour_entry');
     
-    const titleDiv = entry_post.querySelector("#jour_entry_title");
-    if(titleDiv)
-    {
-        titleDiv.contentEditable = "true";
-    }
-    
-    const contentDiv = entry_post.querySelector("#jour_entry_content");
-    if(contentDiv)
-    {
-        contentDiv.contentEditable = "true";
-    }
-        
-    const tagsDiv = entry_post.querySelector("#jour_entry_tags");
-    if(tagsDiv)
-    {
-        tagsDiv.contentEditable = "true";
-    }
-    
-    const toolbar = entry_post.querySelector("#text_editor_toolbar");
-    if(toolbar)
-    {
-        toolbar.style.display = "inline-block";
-    }
-    
-    // Display the save button
-    const saveButton = entry_post.querySelector("#save_button");
-    saveButton.style.display = 'block';
-    
-    
-    const truncatedElement = entry_post.querySelector(".truncated_entries");
-
-    //If the entry is truncated... show the full content during edit mode
-    if(truncatedElement != null)
-    {
-        truncatedElement.classList.remove("truncated_entries");
-        const showMoreButton = entry_post.querySelector("#show_more_button");
-        
-        //Hide the showMore button
-        showMoreButton.style.display = "none";
-    }
     enterEditMode(entry_post);
 }
 
@@ -130,7 +97,7 @@ function toggleDropdown(button)
 // ---------------------------------------------------------
 // Function used to add a Note to the UI/Web Page
 // ---------------------------------------------------------
-async function addNoteToUI(title, content, tags, id, edit_mode=false) 
+async function addNoteToUI(title, content, tags, id) 
 {
     //CREATING A POST
     const entryDiv = document.createElement('div');
@@ -147,18 +114,36 @@ async function addNoteToUI(title, content, tags, id, edit_mode=false)
     const postControls = document.createElement('div');
     postControls.id = "postControls"
     
+    const closeButton = document.createElement('button');
+    closeButton.id = 'close_button';
+    closeButton.innerText = 'X';
+    closeButton.title = 'Close';
+    closeButton.onclick = function(e) {
+        closeNote(e);
+    };
+    postControls.appendChild(closeButton);
+    
     const dropdownDiv = document.createElement('div');
     dropdownDiv.className = 'dropdown';
     postControls.appendChild(dropdownDiv);
     
     const toggleDropdownButton = document.createElement('button');
-    toggleDropdownButton.className = 'page_button';
     toggleDropdownButton.id = 'dropbtn';
     toggleDropdownButton.innerText = '...';
+    toggleDropdownButton.title = 'Options';
     toggleDropdownButton.onclick = function() {
         toggleDropdown(this); 
     };
     dropdownDiv.appendChild(toggleDropdownButton);
+    
+    const copyClipboard = document.createElement('button');
+    copyClipboard.id = 'copy_clipboard';
+    copyClipboard.innerText = '⎘';
+    copyClipboard.title = 'Copy to Clipboard';
+    copyClipboard.onclick = function(e) {
+        copyToClipboard(e);
+    };
+    postControls.appendChild(copyClipboard);
     
     const statusInfo = document.createElement('span');
     statusInfo.id = 'statusInfo';
@@ -230,24 +215,38 @@ async function addNoteToUI(title, content, tags, id, edit_mode=false)
     collapsableContent.appendChild(tagsDiv);
     
     // Create the button save button
+    const jourEntryButtons = document.createElement('div');
+    jourEntryButtons.id = 'jour_entry_buttons';
+    jourEntryButtons.style.display = 'none';
     const saveButton = document.createElement('button');
     saveButton.id = 'save_button';
     saveButton.textContent = 'Save';
-    saveButton.style.display = 'none';
     saveButton.onclick = async (e) => {
       await saveEdit(e);
       // other code after async operation completes
     };
-    entryDiv.appendChild(saveButton);
+    
+    // Create the button save button
+    const discardButton = document.createElement('button');
+    discardButton.id = 'discard_button';
+    discardButton.textContent = 'Discard';
+    discardButton.onclick = async (e) => {
+      await discard(e);
+      // other code after async operation completes
+    };
+    jourEntryButtons.appendChild(saveButton);
+    jourEntryButtons.appendChild(discardButton);
     
     entryDiv.appendChild(postControls);
     entryDiv.appendChild(collapsableContent);
-    entryDiv.appendChild(saveButton);
+    entryDiv.appendChild(jourEntryButtons);
+
     
     // Create the button showMoreButton
     const showMoreButton = document.createElement('button');
     showMoreButton.id = 'show_more_button';
     showMoreButton.textContent = 'Show More';
+    showMoreButton.title = 'Expand/Collapse';
     showMoreButton.style.display = 'none';
     entryDiv.appendChild(showMoreButton);
     
@@ -258,10 +257,7 @@ async function addNoteToUI(title, content, tags, id, edit_mode=false)
     
     checkAddTruncationToEntry(collapsableContent, showMoreButton);
     
-    if (edit_mode)
-    {
-        editBtn.onclick();
-    }
+    return entryDiv;
 }
 
 function checkAddTruncationToEntry(collapsableContent, showMoreButton)
@@ -410,8 +406,6 @@ async function saveEdit(e)
     const contentDiv = entry_post.querySelector("#jour_entry_content");
     const tagsDiv = entry_post.querySelector("#jour_entry_tags");
     const collapsableDiv = entry_post.querySelector("#collapseableDiv");
-    const toolbar = entry_post.querySelector("#text_editor_toolbar");
-    const saveButton = entry_post.querySelector("#save_button");
     const showMoreButton = entry_post.querySelector("#show_more_button");
         
     if(titleDiv && contentDiv)
@@ -455,22 +449,11 @@ async function saveEdit(e)
             showStatusMessage(entry_post, "Server failure - changes not saved!", 3000, "failure");
         }
         
-        titleDiv.contentEditable = "false";
-        contentDiv.contentEditable = "false";
-        tagsDiv.contentEditable = "false";
-        
-        if(toolbar)
-        {
-            toolbar.style.display = "none";
-        }
-
-        //Hide the button back after the content was saved
-        saveButton.style.display = 'none';
+        entry_post.classList.remove("edit_mode");
+        exitEditMode(entry_post);
         
         //Add truncation if needed
         checkAddTruncationToEntry(collapsableDiv, showMoreButton);
-        entry_post.classList.remove("edit_mode");
-        exitEditMode(entry_post);
     }
     else
     {
@@ -478,35 +461,139 @@ async function saveEdit(e)
     }
 }
 
-function enterEditMode(entry)
+function discard(e)
 {
+    const entry_post = e.currentTarget.closest(".jour_entry");
+    const noteId = entry_post.dataset.id;
+    
+    const titleDiv = entry_post.querySelector("#jour_entry_title");
+    const contentDiv = entry_post.querySelector("#jour_entry_content");
+    const tagsDiv = entry_post.querySelector("#jour_entry_tags");
+    
+    const idx = NOTES_CACHE.findIndex(n => n.id === noteId);
+
+    if (idx !== -1)
+    {
+        /*If note already exists in the database*/
+        titleDiv.innerHTML = NOTES_CACHE[idx].title;
+        contentDiv.innerHTML = NOTES_CACHE[idx].content;
+        tagsDiv.innerHTML = NOTES_CACHE[idx].tags;
+        if(NOTES_CACHE[idx].tags)
+        {
+            let formatted_tags = "#" + NOTES_CACHE[idx].tags.replaceAll(" ", ", #");
+        
+            tagsDiv.innerHTML = formatted_tags;
+        }
+        else
+        {
+            tagsDiv.innerHTML = "#";
+        }
+        
+    }
+    exitEditMode(entry_post);
+    if(idx < 0)
+    {
+        const index = visibleNotes.indexOf(entry_post.dataset.id);
+        if (index !== -1)
+        {
+            // Remove it using slice or splice
+            visibleNotes = [...visibleNotes.slice(0, index), ...visibleNotes.slice(index + 1)];
+        }
+        
+        entry_post.remove();
+    }
+}
+
+function enterEditMode(entry_post)
+{
+    const jourEntryButtons = entry_post.querySelector("#jour_entry_buttons");
+    
+    const titleDiv = entry_post.querySelector("#jour_entry_title");
+    if(titleDiv)
+    {
+        titleDiv.contentEditable = "true";
+    }
+    
+    const contentDiv = entry_post.querySelector("#jour_entry_content");
+    if(contentDiv)
+    {
+        contentDiv.contentEditable = "true";
+    }
+        
+    const tagsDiv = entry_post.querySelector("#jour_entry_tags");
+    if(tagsDiv)
+    {
+        tagsDiv.contentEditable = "true";
+    }
+    
+    const toolbar = entry_post.querySelector("#text_editor_toolbar");
+    if(toolbar)
+    {
+        toolbar.style.display = "inline-block";
+    }
+    
+    // Display the save button
+    jourEntryButtons.style.display = 'inline-block';
+    
+    // Remove truncation **after the entry is in the DOM**
+    const truncatedElement = entry_post.querySelector(".truncated_entries");
+    if(truncatedElement)
+    {
+        truncatedElement.classList.remove("truncated_entries");
+        const showMoreButton = entry_post.querySelector("#show_more_button");
+        if(showMoreButton)
+        {
+            showMoreButton.style.display = "none";
+        }
+    }
+    
     const overlay = document.createElement("div");
     overlay.className = "edit_mode";
     
     // Save original position
-    entry._originalParent = entry.parentNode;
-    entry._originalNext = entry.nextSibling;
+    entry_post._originalParent = entry_post.parentNode;
+    entry_post._originalNext = entry_post.nextSibling;
     
-    entry.draggable = false;
-    overlay.appendChild(entry);
+    entry_post.draggable = false;
+    overlay.appendChild(entry_post);
     document.body.appendChild(overlay);
+
 }
 
-function exitEditMode(entry)
+function exitEditMode(entry_post)
 {
-    const parent = entry._originalParent;
-    const next = entry._originalNext;
+    const jourEntryButtons = entry_post.querySelector("#jour_entry_buttons");
+    
+    const titleDiv = entry_post.querySelector("#jour_entry_title");
+    const contentDiv = entry_post.querySelector("#jour_entry_content");
+    const tagsDiv = entry_post.querySelector("#jour_entry_tags");
+    
+    const toolbar = entry_post.querySelector("#text_editor_toolbar");
+    if(toolbar)
+    {
+        toolbar.style.display = "none";
+    }
+    
+    const parent = entry_post._originalParent;
+    const next = entry_post._originalNext;
 
     if (next)
     {
-        parent.insertBefore(entry, next);
+        parent.insertBefore(entry_post, next);
     }
     else
     {
-        parent.appendChild(entry);
+        parent.appendChild(entry_post);
     }
-    entry.draggable = true;
+    entry_post.draggable = true;
     document.querySelector(".edit_mode").remove();
+    
+    //Hide the button back after the content was saved
+    jourEntryButtons.style.display = 'none';
+    
+    titleDiv.contentEditable = "false";
+    contentDiv.contentEditable = "false";
+    tagsDiv.contentEditable = "false";
 }
 
 // ---------------------------------------------------------
@@ -532,8 +619,15 @@ async function addPost()
     
     const newId = 'note-' + Date.now();
     const newNote = { id: newId, title: "New Note", content: "Add your content here...", tags: "" };
-    NOTES_CACHE.push(newNote);
-    await addNoteToUI(newNote.title, newNote.content, newNote.id, newNote.tags, true);
+    
+    const entry = await addNoteToUI(newNote.title, newNote.content, newNote.tags, newNote.id);
+    
+    if(visibleNotes.includes(newNote.id) == false)
+    {
+        visibleNotes.push(newNote.id)
+    }
+    
+    enterEditMode(entry);
 }
 
 // ---------------------------------------------------------
@@ -543,13 +637,38 @@ async function remove_entry(e)
 {
     const entryDiv = e.currentTarget.closest('.jour_entry');
     const noteId = entryDiv.dataset.id;
-
+    
+    if(document.querySelector(".edit_mode"))
+    {
+        /*If div is in edit mode*/
+        exitEditMode(entryDiv);
+    }
+    
     const idx = NOTES_CACHE.findIndex(n => n.id === noteId);
     if (idx !== -1)
     {
         NOTES_CACHE.splice(idx, 1);
     }
-    await saveUserNotesToDatabase();
+    
+    const index = visibleNotes.indexOf(entryDiv.dataset.id);
+    if (index !== -1)
+    {
+        // Remove it using slice or splice
+        visibleNotes = [...visibleNotes.slice(0, index), ...visibleNotes.slice(index + 1)];
+    }
+    
+    entryDiv.remove();
+    
+    let result = await saveUserNotesToDatabase();
+    
+    if (result)
+    {
+        //alert("Saved successfully!");
+    }
+    else
+    {
+        //alert("Server failure - changes not saved!");
+    }
 }
 
 // ---------------------------------------------------------
@@ -613,13 +732,86 @@ function populateTags(tags)
         const btn = document.createElement("button");
         btn.className = "tag_button";
         btn.dataset.tag = tag;
+        btn.tagEnabled = true;
+        
+        btn.classList.add("tagEnabled");
         btn.textContent = `#${tag}`;
-        btn.addEventListener("click", () => filterNotesByTag(tag));
+        btn.addEventListener("click", async () => {
+            if(btn.tagEnabled)
+            {
+                removeEntriesFromDOM(tag);
+                btn.tagEnabled = false;
+                btn.classList.remove("tagEnabled");
+                btn.title = "Select tag";
+                
+                //Remove tag from the list of active tags
+                const index = activeTags.indexOf(btn.dataset.tag);
+                
+                if (index !== -1)
+                {
+                  // Remove it using slice or splice
+                  activeTags = [...activeTags.slice(0, index), ...activeTags.slice(index + 1)];
+                }
+            }
+            else
+            {
+                await filterNotesByTag(tag);
+                btn.tagEnabled = true;
+                btn.classList.add("tagEnabled");
+                btn.title = "Deselect tag";
+                
+                //Add the tag to the active tags list;
+                activeTags.push(btn.dataset.tag);
+            }
+        });
         tagContainer.appendChild(btn);
     });
 
     // Update total tags
     document.getElementById("total_tags").textContent = `Tags: ${tags.size}`;
+}
+
+async function filterNotesByTag(tag)
+{
+    for (const note of NOTES_CACHE)
+    {
+        if(note.tags.includes(tag))
+        {
+            await addNoteToUI(note.title, note.content, note.tags, note.id);
+            if(visibleNotes.includes(note.id) == false)
+            {
+                visibleNotes.push(note.id)
+            }
+        }
+    }
+    truncatedContentHandling(); // attach click handler
+}
+
+function removeEntriesFromDOM(tag)
+{
+    const content = document.getElementsByClassName("jour_entry");
+    
+    let index = 0;
+    while(index < content.length)
+    {
+        const tagContentDiv = content[index].querySelector("#jour_entry_tags");
+        
+        const tagList = tagContentDiv.innerText.replaceAll("#", "").split(", ");
+        if(tagList.includes(tag))
+        {
+            const match = visibleNotes.indexOf(content[index].dataset.id);
+            if (match !== -1)
+            {
+                // Remove it using slice or splice
+                visibleNotes = [...visibleNotes.slice(0, match), ...visibleNotes.slice(match + 1)];
+            }
+            content[index].remove();
+        }
+        else
+        {
+            index ++;
+        }
+    }
 }
 
 function toggleSidebar()
@@ -669,12 +861,209 @@ function addDraggingBehavior()
     });
 }
 
+async function selectAllElements()
+{
+    const tagContainer = document.getElementById("tag_buttons");
+    
+    for(btn of tagContainer.children)
+    {
+        btn.tagEnabled = true;
+        btn.classList.add("tagEnabled");
+        activeTags.push(btn.dataset.tag);
+    }
+    
+    for (const note of NOTES_CACHE)
+    {
+        await addNoteToUI(note.title, note.content, note.tags, note.id);
+        if(visibleNotes.includes(note.id) == false)
+        {
+            visibleNotes.push(note.id)
+        }
+    }
+}
+
+async function deselectAllElements()
+{
+    const tagContainer = document.getElementById("tag_buttons");
+    
+    for(btn of tagContainer.children)
+    {
+        btn.tagEnabled = false;
+        btn.classList.remove("tagEnabled");
+        
+        const index = activeTags.indexOf(btn.dataset.tag);
+        if (index !== -1)
+        {
+          // Remove it using slice or splice
+          activeTags = [...activeTags.slice(0, index), ...activeTags.slice(index + 1)];
+        }
+        
+    }
+    
+    const content = document.getElementsByClassName("jour_entry");
+    
+    while(content.length > 0)
+    {
+        
+        const index = visibleNotes.indexOf(content[0].dataset.id);
+        if (index !== -1)
+        {
+            // Remove it using slice or splice
+            visibleNotes = [...visibleNotes.slice(0, index), ...visibleNotes.slice(index + 1)];
+        }
+        
+        content[0].remove();
+    }
+}
+
+function closeNote(e)
+{
+    const entry_post = e.target.closest(".jour_entry");
+    
+    /*If in edit mode... only close the edit mode*/
+    if(document.querySelector(".edit_mode"))
+    {
+        /*If div is in edit mode*/
+        exitEditMode(entry_post);
+    }
+    else
+    {
+        /*If NOT in edit mode... close the note*/
+        const tagContainer = document.getElementById("tag_buttons");
+        
+        if(entry_post)
+        {
+            const tagsDiv = entry_post.querySelector("#jour_entry_tags");
+            console.log("Org Tags: " + tagsDiv.innerHTML);
+            let unformatted_tags = tagsDiv.innerHTML;
+            unformatted_tags = unformatted_tags.replaceAll("#", "");
+            unformatted_tags = unformatted_tags.split(", ");
+            const tags = unformatted_tags;
+            console.log("Tags: " + tags);
+            for(item of tags)
+            {
+                const index = activeTags.indexOf(item);
+                if (index !== -1)
+                {
+                    // Remove it using slice or splice
+                    activeTags = [...activeTags.slice(0, index), ...activeTags.slice(index + 1)];
+                    if(activeTags.includes(item) == false)
+                    {
+                        if(tagContainer)
+                        {
+                            /*Extracting button from container using dataset.tag*/
+                            const btn = tagContainer.querySelector(`[data-tag="${item}"]`);
+                            
+                            if(btn)
+                            {
+                                /*update the tag button state*/
+                                btn.classList.remove("tagEnabled");
+                                btn.tagEnabled = false;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            const index = visibleNotes.indexOf(entry_post.dataset.id);
+            if (index !== -1)
+            {
+                // Remove it using slice or splice
+                visibleNotes = [...visibleNotes.slice(0, index), ...visibleNotes.slice(index + 1)];
+            }
+            entry_post.remove();
+        }
+    }
+}
+
+async function performSearch()
+{
+    const visibleNotes_Temp = visibleNotes;
+    await deselectAllElements();
+    visibleNotes = visibleNotes_Temp;
+    searchValue = document.getElementById("search_input").value;
+    
+    if(searchValue.trim() != "")
+    {
+        for(note of NOTES_CACHE)
+        {
+            if(note.title.includes(searchValue) || note.content.includes(searchValue) || note.tags.includes(searchValue))
+            {
+                await addNoteToUI(note.title, note.content, note.tags, note.id);
+            }
+        }
+    }
+    else
+    {
+        console.log("visibleNotes: "+ visibleNotes);
+        for(note of NOTES_CACHE)
+        {
+            const index = visibleNotes.indexOf(note.id);
+            if (index !== -1)
+            {
+                /*if the item was selected/visible before the search*/
+                await addNoteToUI(note.title, note.content, note.tags, note.id);
+            }
+        }
+    }
+}
+
+function copyToClipboard(e)
+{
+    const entry_post = e.target.closest(".jour_entry");
+    const titleDiv = entry_post.querySelector("#jour_entry_title");
+    const contentDiv = entry_post.querySelector("#jour_entry_content");
+    const tagsDiv = entry_post.querySelector("#jour_entry_tags");
+    
+    var text = titleDiv.innerText + "\n\n" + contentDiv.innerText;
+    navigator.clipboard.writeText(text)
+        .then(() => {
+            console.log("Copied to clipboard");
+        })
+        .catch(err => {
+            console.error("Copy failed:", err);
+        });
+}
+
+//Add search_box
+const searchInput = document.getElementById("search_input");
+
+searchInput.addEventListener("keydown", async function (event)
+{
+    if (event.key === "Enter")
+    {
+        event.preventDefault();   // prevents form submission / page reload
+        await performSearch();          // call your function
+    }
+});
+
+//Clear Searching
+const clearSearch = document.getElementById("clear_search_button");
+clearSearch.addEventListener("click", async function (e)
+{
+    document.getElementById("search_input").value = "";
+    await performSearch();          // call your function
+});
+
 //Add toggleSidebar button handler
 const sidebar = document.getElementById("jour_navigation");
 const toggleButton = document.getElementById("toggle_sidebar_button");
 
 toggleButton.addEventListener("click", () => {
     toggleSidebar();
+});
+
+//Add selection control buttons
+
+const selectAllButton = document.getElementById("select_all");
+const deselectAllButton = document.getElementById("deselect_all");
+
+selectAllButton.addEventListener("click", async () => {
+    await selectAllElements();
+});
+
+deselectAllButton.addEventListener("click", async () => {
+    await deselectAllElements();
 });
 
 addDraggingBehavior();

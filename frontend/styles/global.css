@@ -9,7 +9,7 @@
     --h2-header-font: normal bold 1.6rem/1 Calibri, serif;
     --h3-header-font: normal bold 1.4rem/1 Calibri, serif;
     --site-title-font: normal bold 1.2rem/1.2 FjallaOne, serif;
-    --user-logged-font: normal normal 1rem/1.2 FjallaOne, serif;
+    --user-logged-font: normal normal 0.7rem/1 FjallaOne, serif;
     --nav-font: normal bold 1.2rem/1.4 FjallaOne, serif;
     --button-font: normal bold 1.1rem/1 Calibri, serif;
     --login-labels-font: normal normal 1rem/1.2 Calibri, serif;
@@ -27,7 +27,7 @@
         --h2-header-font: normal bold 1.3rem/1 Calibri, serif;
         --h3-header-font: normal bold 1.1rem/1 Calibri, serif;
         --site-title-font: normal bold 1rem/1.2 FjallaOne, serif;
-        --user-logged-font: normal normal 0.9rem/1.2 FjallaOne, serif;
+        --user-logged-font: normal normal 0.8rem/1 FjallaOne, serif;
         --nav-font: normal bold 1rem/1.2 FjallaOne, serif;
         --button-font: normal bold 1rem/1 Calibri, serif;
         --login-labels-font: normal normal 0.9rem/1.2 Calibri, serif;
@@ -44,7 +44,7 @@
         --h2-header-font: normal bold 1.1rem/1 Calibri, serif;
         --h3-header-font: normal bold 0.9rem/1 Calibri, serif;
         --site-title-font: normal bold 0.8rem/1.2 FjallaOne, serif;
-        --user-logged-font: normal normal 0.8rem/1.2 FjallaOne, serif;
+        --user-logged-font: normal normal 0.7rem/1 FjallaOne, serif;
         --nav-font: normal bold 0.8rem/1.4 FjallaOne, serif;
         --button-font: normal bold 0.8rem/1 Calibri, serif;
         --login-labels-font: normal normal 0.8rem/1.2 Calibri, serif;

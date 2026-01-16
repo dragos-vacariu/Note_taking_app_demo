@@ -25,6 +25,7 @@
             <h2>Catalogue -> <a href={{fullstack_apps_page.value}}>{{fullstack_apps_page.name}}</a> -> Note Taking App</h2>
 
             <div id="app_page_content">
+                <div id="page_title">Note Taking App <sup>-> Home</sup></div>
                 <div id="unlockModal" class="modal hidden">
                     <div class="modal-content">
                         <h2>🔒 Unlock Your Vault</h2>
@@ -39,33 +40,41 @@
                 <div id="page_content">
                     <header>
                         <nav class="app-nav">
-                            <a href="./app.html" class="selected_link">🏠 Home</a>
-                            <a href="./settings.html">⚙️ Settings</a>
-                            <a href="./logout.html">⏻ Logout</a>
+                            <a href="/frontend/app.html" class="selected_link">🏠 Home</a>
+                            <a href="/frontend/settings.html">⚙️ Settings</a>
+                            <a href="/frontend/logout.html">⏻ Logout</a>
                             
                         </nav>
-                        <div id="menu">
-                            <div id="logged_user_info">Logged as: <span id="user_logged"></span></div>
-                            <button id="add_entry_button" class="page_button">Add Entry</button>
-                            <!--<button onclick = "savePage()">Export Page</button>-->
-                        </div>
                     </header>
 
                     <div id="page_layout">
                         <div id="jour_navigation">
                             <div id="sidebar_wrapper">
                                 <!-- Toggle button inside wrapper -->
-                                <button id="toggle_sidebar_button" class="sidebar_toggle">&lt;</button>
+                                <button id="toggle_sidebar_button" class="sidebar_toggle" title="Show/Hide Sidebar">&lt;</button>
 
                                 <!-- Actual sidebar content -->
                                 <div id="sidebar_content">
+                                    <div id="logged_user_info">User: <span id="user_logged"></span></div>
                                     <!-- Search Section -->
                                     <div id="search_section">
                                         <input type="text" id="search_input" placeholder="Search notes..." />
+                                        <button id="clear_search_button" title="Clear Search">⌫</button>
+                                        <!--
                                         <select id="search_type">
                                             <option value="contextual">Contextual Search</option>
                                             <option value="match_words">Match Words</option>
                                         </select>
+                                        -->
+                                    </div>
+                                    
+                                    <!-- Selection Controls -->
+                                    <div id="categories_section">
+                                        <strong>Selection Controls</strong>
+                                        <div id="selection_control_buttons">
+                                        <button id="select_all" class="page_button selection_controls" title = "Show All Notes">Show All</button>
+                                        <button id="deselect_all" class="page_button selection_controls" title = "Hide All Notes">Hide All</button>
+                                        </div>
                                     </div>
 
                                     <!-- Categories / Tags -->
@@ -82,7 +91,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div id = "journalled_content">
                             
                             <!--
@@ -109,6 +117,7 @@
                         </div>
                     </div>
                 </div>
+                <button id="add_entry_button" class="add_fab" title="Add Entry">+</button>
             </div>
         </div>
         <footer id="page_footer">

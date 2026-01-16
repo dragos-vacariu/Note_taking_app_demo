@@ -20,13 +20,6 @@ body
     box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
-#page_content {
-    display: flex;
-    flex-direction: column;
-    width: auto;
-    /*height: 100vh;*/ /* full viewport height */
-}
-
 header {
     position: sticky;
     top: 0;
@@ -36,31 +29,15 @@ header {
     padding: 8px 16px;
 }
 
-#menu {
+#page_content {
     display: flex;
-    justify-content: space-between; /* push items to edges */
-    align-items: center;            /* vertically center items */
-    gap: 12px;                      /* space between buttons if multiple */
-    padding: 0 16px;                /* optional padding */
-    width: 100%;
-    box-sizing: border-box;
-}
-
-#logged_user_info{
-    font: var(--user-logged-font);
-    background-color: var(--light-gray-color);
-    color: var(--darkbrown-color);
-    margin: 5px;
-    padding:5px;
-    letter-spacing: 0.5px;
-}
-
-#logged_user_info #user{
-    color: var(--blue-color);
-    font-weight: bold;
+    flex-direction: column;
+    width: auto;
+    /*height: 100vh;*/ /* full viewport height */
 }
 
 #page_layout {
+    position: relative;   /* IMPORTANT */
     display: flex;
     align-items: flex-start;   /* align sidebar & content to top */
     width: 100%;
@@ -72,7 +49,7 @@ header {
 
 #jour_navigation {
     position: sticky;
-    top: 120px;            /* adjust for header height */
+    top: 65px;            /* adjust for header height */
     display: flex;
     flex-direction: row;  /* sidebar + toggle button */
     width: 250px;
@@ -81,6 +58,15 @@ header {
     
     border: none 2px green;
     margin-right: 3px;
+}
+
+#sidebar_controls{
+    width: 100%;
+    display: flex;
+    flex-direction: row;  /* stack sidebar + button vertically */
+    align-items: flex-start;
+    padding: 1px;
+    border: solid 2px red;
 }
 
 #sidebar_wrapper {
@@ -100,10 +86,31 @@ header {
     background-color: #f7f7f7;
 
     border: 1px solid #ddd;
-
+    width: 100%;
     max-height: 100vh;
     overflow-y: auto;
     order: 2; /* push below toggle button visually */
+}
+
+#logged_user_info{
+    position: relative;
+    font: var(--user-logged-font);
+    color: var(--darkbrown-color);
+    margin: 1px;
+    padding:2px;
+    letter-spacing: 0.5px;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    width: auto;
+    max-width: 100%;
+}
+
+#logged_user_info #user{
+    color: var(--blue-color);
+    font-weight: bold;
+    word-wrap: break-word;
+    overflow-wrap: break-word; /* For modern browsers */
 }
 
 /* Toggle button stays at the top */
@@ -146,7 +153,7 @@ header {
 #search_section
 {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
 }
 
@@ -155,6 +162,8 @@ header {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+
+
 
 #search_type {
     padding: 4px 8px;
@@ -175,24 +184,53 @@ header {
     color: var(--darkbrown-color);
 }
 
-#tag_buttons {
+#tag_buttons{
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
 }
 
+#clear_search_button{
+    padding: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    color: var(--blue-color);
+    background-color: #fff;
+}
+
 /* Tag buttons */
 .tag_button {
     padding: 4px 8px;
-    border: 1px solid #bbb;
     border-radius: 4px;
-    background-color: #eee;
     cursor: pointer;
     font-size: 0.85rem;
+    border: 1px solid #aaa;
+    color: black;
+    background-color: #eee;
+    
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
-.tag_button:hover {
+.tag_button:hover, #clear_search_button:hover {
     background-color: #ddd;
+}
+
+#tag_buttons .tagEnabled{
+    color: white;
+    background-color: var(--blue-color);
+}
+
+#tag_buttons .tagEnabled:hover {
+    background-color: #00d;
+}
+
+.selection_controls{
+    padding: 4px !important;
 }
 
 /* Stats Section */
@@ -202,6 +240,33 @@ header {
     justify-content: space-between;
     font-size: 0.85rem;
     color: #555;
+}
+
+#jour_container{
+
+}
+
+.add_fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    font-size: 28px;
+    font-weight: bold;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: var(--blue-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+
+    z-index: 1000;
 }
 
 /* RIGHT CONTENT AREA */
@@ -279,6 +344,9 @@ header {
     margin: 2px 0px;
     padding: 2px 15px;
     
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    
     /*The following will ensure that the width of the element will not grow with the added border-size.
     So the border will be within the defined element width.
     */
@@ -287,8 +355,8 @@ header {
     box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
-.collapseableDivs{
-    display: block;
+#collapseableDiv{
+    padding:0px;
 }
 
 .jour_entry #jour_entry_title, .jour_entry #jour_entry_content, .jour_entry #text_editor_toolbar,
@@ -330,42 +398,60 @@ header {
 }
 
 /* Style the truncated elements */
-.truncated_entries
+.jour_entry .truncated_entries
 {
     display: -webkit-box;
-    -webkit-line-clamp: 10; /* show only 5 lines */
+    -webkit-line-clamp: 10; /* show only 10 lines */
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
 /* Style the truncated elements */
-.edit_mode
-{
+.edit_mode {
     position: fixed;
-    inset: 0;
+    inset: 0;                   /* top:0; right:0; bottom:0; left:0 */
     background: rgba(0,0,0,0.6);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
+    overflow: auto;             /* allow scrolling if content is tall */
+    padding: 16px;              /* optional spacing */
 }
 
 .edit_mode .jour_entry {
-    width: 80%;
+    width: 100%;
     max-width: 800px;
-    max-height: 85vh;
-
-    overflow-y: auto;
-    padding: 20px;
-
-    border-radius: 12px;
+    height: auto;               /* let it grow */
+    max-height: 90vh;           /* don’t overflow screen */
+    overflow: auto;             /* scroll if content too tall */
     background-color: #fff;
-
+    border-radius: 12px;
+    padding: 20px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
 
+/* Entry inside overlay */
+.edit_mode .jour_entry #jour_entry_title, 
+.edit_mode .jour_entry #jour_entry_content, 
+.edit_mode .jour_entry #jour_entry_tags
+{
+    overflow: auto;
+}
+
+.edit_mode .jour_entry #jour_entry_title{
+    max-height: 10vh;
+}
+.edit_mode .jour_entry #jour_entry_content{
+    max-height: 50vh;
+    height: 50vh;
+}
+.edit_mode .jour_entry #jour_entry_tags{
+    max-height: 10vh;
+}
+
 /* Style the button for Show More/Show Less */
-#show_more_button, #save_button {
+#show_more_button, #save_button, #discard_button {
     display: inline-block;
     margin-top: 0.5em;
     padding: 0.35em 1em;
@@ -381,20 +467,16 @@ header {
     border-radius: 25px;
 }
 
-#save_button{
+#save_button, #discard_button{
     border-radius: 10px;
+    display: inline-block;
+    margin: 5px;
 }
 
-#show_more_button:hover, #save_button:hover {
+#show_more_button:hover, #save_button:hover, #discard_button:hover {
     opacity: 0.5;
     transform: translateY(-2px);
 } 
-
-#postControls {
-    display: flex;
-    align-items: center; /* vertically center button + status box */
-    gap: 6px; /* space between the ... button and status box */
-}
 
 #statusInfo {
     display: inline-block;
@@ -450,7 +532,7 @@ header {
 }
 
 #text_editor_toolbar .fontSizeSelect{
-        position: relative;
+    position: relative;
 
     margin: 0px 2px;
     padding: 0px;
@@ -464,6 +546,13 @@ header {
     color: white;
 }
 
+#postControls {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center; /* vertically center button + status box */
+    gap: 6px; /* space between the ... button and status box */
+}
+
 /* Basic styling for the button */
 .dropdown 
 {
@@ -472,15 +561,39 @@ header {
     margin: 0.5% 1%;
 }
 
+.dropdown #dropbtn, #close_button, #copy_clipboard
+{
+    border: none 1px #ccc;
+    color: var(--blue-color);
+    font: var(--button-font);
+    cursor: pointer;
+    padding: 2px;
+}
+
+.dropdown #dropbtn
+{
+    border-radius: 15px;
+    /*writing-mode: vertical-rl;*/ /* vertical text from bottom to top */
+    /* or */
+    /* writing-mode: vertical-lr; */ /* vertical text from top to bottom */
+    /*text-orientation: mixed;*/ /* ensures proper orientation for characters */
+}
+
+.dropdown #dropbtn:hover, #close_button:hover, #copy_clipboard:hover
+{
+    background-color: #00d;
+    color: white;
+}
 /* Container for the dropdown menu */
 .dropdown-content 
 {
     display: none; /* Hidden by default */
     position: absolute;
     background-color: var(--light-gray-color);
-    min-width: 160px;
+    min-width: 100px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
+    right: 0%;
 }
 
 /* Style for each menu item */
