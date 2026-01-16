@@ -164,6 +164,16 @@ async function addNoteToUI(title, content, tags, id)
         toggleEdit(e); 
     };
     dropdownContentDiv.appendChild(editBtn);
+    
+    const saveTxtFile = document.createElement('a');
+    saveTxtFile.innerText = 'Save';
+    saveTxtFile.href = '#';
+    saveTxtFile.id = 'saveAsText';
+
+    saveTxtFile.onclick = function(e) {
+        saveTextAsFile(e); 
+    };
+    dropdownContentDiv.appendChild(saveTxtFile);
 
     const removeBtn = document.createElement('a');
     removeBtn.innerText = 'Remove';
@@ -1025,6 +1035,50 @@ function copyToClipboard(e)
         });
 }
 
+
+function saveTextAsFile(e)
+{
+    const entry_post = e.target.closest(".jour_entry");
+    const titleDiv = entry_post.querySelector("#jour_entry_title");
+    const contentDiv = entry_post.querySelector("#jour_entry_content");
+    const tagsDiv = entry_post.querySelector("#jour_entry_tags");
+    
+    var text = titleDiv.innerText + "\n\n" + contentDiv.innerText;
+    
+    const filename = titleDiv.innerText.replaceAll(" ", "_").slice(0, 30);
+    // Create a Blob object with the text content
+    const blob = new Blob([text], { type: 'text/plain' });
+    
+    // Generate a URL for the Blob
+    const url = URL.createObjectURL(blob);
+    
+    // Create a temporary link element
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename; // Set the filename for the download
+    
+    // Append the link to the document and trigger click
+    document.body.appendChild(a);
+    a.click();
+    
+    // Clean up
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+//Add dropdown handler: If dropdown content is displayed hide the content when clicking outside of it
+document.addEventListener("click", function (e) {
+    const dropdowns = document.querySelectorAll(".dropdown-content");
+
+    dropdowns.forEach(menu => {
+        // If click is outside the dropdown
+        if (!menu.parentElement.contains(e.target))
+        {
+            menu.classList.remove("show");
+        }
+    });
+});
+
 //Add search_box
 const searchInput = document.getElementById("search_input");
 
@@ -1044,6 +1098,7 @@ clearSearch.addEventListener("click", async function (e)
     document.getElementById("search_input").value = "";
     await performSearch();          // call your function
 });
+
 
 //Add toggleSidebar button handler
 const sidebar = document.getElementById("jour_navigation");
