@@ -13,3 +13,8 @@
     z-index: 0 !important;
     border: none 1px green !important;
 }
+
+.dropdown-content a 
+{
+    color: black !important;
+}
