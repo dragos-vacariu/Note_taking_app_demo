@@ -1,10 +1,14 @@
 #app_page_content
 {
-    border: groove 2px rgba(0,0,0,0.1);
+    position:relative;
+    overflow:hidden !important;
+    background-color: var(--light-gray-color);
+    height: auto;
     min-height: 30vw;
 }
 
 #page_content header{
     position: relative !important;
     z-index: 0 !important;
+    border: solid 2px green !important;
 }

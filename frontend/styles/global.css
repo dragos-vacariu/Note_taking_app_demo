@@ -55,6 +55,19 @@
     }
 }
 
+
+/* Make all elements include padding/border in width */
+*,
+*::before,
+*::after {
+    /*The following will ensure that the width of the element will not grow with the added border-size.
+    So the border will be within the defined element width.
+    */
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
+}
+
 #page_title
 {
     font: var(--site-title-font);

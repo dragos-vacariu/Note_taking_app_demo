@@ -26,6 +26,7 @@ header {
     z-index: 1000;
     background-color: #fff; /* or match your theme */
     box-shadow: 0 2px 5px rgba(0,0,0,0.1)!important;
+    border: none 2px black! important;
     padding: 8px 16px;
 }
 
@@ -41,7 +42,8 @@ header {
     display: flex;
     align-items: flex-start;   /* align sidebar & content to top */
     width: 100%;
-    border: none 2px black;
+    border: none 2px black! important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1)!important;
 }
 
 /* LEFT NAVIGATION */
