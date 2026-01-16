@@ -34,6 +34,7 @@ header {
     display: flex;
     flex-direction: column;
     width: auto;
+    min-height: 100vh;
     /*height: 100vh;*/ /* full viewport height */
 }
 
@@ -43,7 +44,7 @@ header {
     align-items: flex-start;   /* align sidebar & content to top */
     width: 100%;
     border: none 2px black! important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1)!important;
+    /*box-shadow: 0 2px 5px rgba(0,0,0,0.1)!important;*/
 }
 
 /* LEFT NAVIGATION */
@@ -89,7 +90,7 @@ header {
 
     border: 1px solid #ddd;
     width: 100%;
-    max-height: 100vh;
+    min-height: 70vh;
     overflow-y: auto;
     order: 2; /* push below toggle button visually */
 }
@@ -290,6 +291,10 @@ header {
         flex-wrap: wrap;
         padding: 8px;
         gap: 8px;
+    }
+    
+    #sidebar_content{
+        min-height: auto;
     }
 
     #tag_buttons {
