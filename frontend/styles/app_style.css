@@ -609,7 +609,7 @@ header {
 {
     position: relative;
     display: inline-block;
-    margin: 0.5% 1%;
+    padding: 2px;
 }
 
 .dropdown #dropbtn, #close_button, #copy_clipboard, #dragHandleButton, #postDetailsButton
@@ -623,7 +623,6 @@ header {
 
 .dropdown #dropbtn
 {
-    border-radius: 15px;
     /*writing-mode: vertical-rl;*/ /* vertical text from bottom to top */
     /* or */
     /* writing-mode: vertical-lr; */ /* vertical text from top to bottom */

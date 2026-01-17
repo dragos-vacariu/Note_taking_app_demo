@@ -119,7 +119,7 @@ async function addNoteToUI(title, content, tags, id, editDate=undefined)
     
     const closeButton = document.createElement('button');
     closeButton.id = 'close_button';
-    closeButton.innerText = 'X';
+    closeButton.innerText = '✖';
     closeButton.title = 'Close';
     closeButton.onclick = function(e) {
         closeNote(e);
