@@ -159,7 +159,7 @@ async function addNoteToUI(title, content, tags, id, editDate=undefined)
     const postDetails = document.createElement('button');
     postDetails.id = 'postDetailsButton';
     postDetails.className = 'post_details_button';
-    postDetails.innerText = 'ℹ️';
+    postDetails.innerText = 'ⓘ';
     postDetails.title = 'Post Details';
     postDetails.onclick = function(e) {
         showHidePostDetails(e);
