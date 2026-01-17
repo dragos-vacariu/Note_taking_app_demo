@@ -111,6 +111,9 @@ async function addNoteToUI(title, content, tags, id)
     
     //============================================================
     //ADDING BUTTONS AND FORM ELEMENTS
+    const postHeader = document.createElement('div');
+    postHeader.id = "postHeader";
+    
     const postControls = document.createElement('div');
     postControls.id = "postControls"
     
@@ -158,7 +161,16 @@ async function addNoteToUI(title, content, tags, id)
     statusInfo.innerText = 'status';
 
     postControls.appendChild(statusInfo);
-
+    
+    postHeader.appendChild(postControls);
+    
+    const timestamp = document.createElement('span');
+    timestamp.id = 'note_timestamp';
+    let post_date = id.replace("note-", "");
+    post_date = formatTimestamp(post_date);
+    timestamp.innerText = post_date;
+    postHeader.appendChild(timestamp);
+    
     const dropdownContentDiv = document.createElement('div');
     dropdownContentDiv.className = 'dropdown-content';
     dropdownDiv.appendChild(dropdownContentDiv);
@@ -255,7 +267,7 @@ async function addNoteToUI(title, content, tags, id)
     jourEntryButtons.appendChild(saveButton);
     jourEntryButtons.appendChild(discardButton);
     
-    entryDiv.appendChild(postControls);
+    entryDiv.appendChild(postHeader);
     entryDiv.appendChild(collapsableContent);
     entryDiv.appendChild(jourEntryButtons);
 
@@ -316,20 +328,19 @@ function createToolbar()
         btn.addEventListener('click', () => {
             document.execCommand(command, false, value);
         });
-        btn.style.marginRight = '3px';
         return btn;
     };
     
     
     toolbar.appendChild(addButton('<b>Tx</b>', 'removeFormat', "Clear formatting"));
-    toolbar.appendChild(addButton('<b>B</b>', 'bold', "bold font"));
-    toolbar.appendChild(addButton('<i>I</i>', 'italic', "italic font"));
-    toolbar.appendChild(addButton('<u>U</u>', 'underline', "underline font"));
-    toolbar.appendChild(addButton('S', 'strikeThrough', "strikeThrough font"));
+    toolbar.appendChild(addButton('<b>B</b>', 'bold', "Bold Font"));
+    toolbar.appendChild(addButton('<i>I</i>', 'italic', "Italic Font"));
+    toolbar.appendChild(addButton('<u>U</u>', 'underline', "Underline Font"));
+    toolbar.appendChild(addButton('S', 'strikeThrough', "StrikeThrough Font"));
     
     // Lists
-    toolbar.appendChild(addButton('• List', 'insertUnorderedList', "unoderedList"));
-    toolbar.appendChild(addButton('1. List', 'insertOrderedList', "orderedList"));
+    toolbar.appendChild(addButton('• List', 'insertUnorderedList', "Unodered List"));
+    toolbar.appendChild(addButton('1. List', 'insertOrderedList', "Ordered List"));
     
     // Alignment
     toolbar.appendChild(addButton('Left', 'justifyLeft', "Text Allign Left"));
@@ -348,7 +359,7 @@ function createToolbar()
     // Highlight (background color)
     const highlightInput = document.createElement('input');
     highlightInput.type = 'color';
-    highlightInput.title = 'Highlight';
+    highlightInput.title = 'Highlight Color';
     highlightInput.classList.add("colorPicker");
     highlightInput.addEventListener('input', (e) => 
                     document.execCommand('hiliteColor', false, e.target.value));
@@ -356,12 +367,13 @@ function createToolbar()
     
     // Font size (1-7 scale)
     const fontSizeSelect = document.createElement('select');
+    fontSizeSelect.title = "Font Size";
     fontSizeSelect.classList.add("fontSizeSelect");
     for(let i=1; i<=7; i++)
     {
         const option = document.createElement('option');
         option.value = i;
-        option.text = `Size ${i}`;
+        option.text = `Font Size ${i}`;
         fontSizeSelect.appendChild(option);
     }
     
@@ -948,7 +960,7 @@ function closeNote(e)
     if(document.querySelector(".edit_mode"))
     {
         /*If div is in edit mode*/
-        exitEditMode(entry_post);
+        discard(e);
     }
     else
     {
@@ -1110,6 +1122,24 @@ function expandCollapseAllEntries()
     {
         expandCollapseAllButton.innerText = "►"
     }
+}
+
+function formatTimestamp(timestamp)
+{
+    const date = new Date(Number(timestamp));
+
+    if (isNaN(date.getTime())) {
+        return "Invalid date";
+    }
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
 }
 
 //Add dropdown handler: If dropdown content is displayed hide the content when clicking outside of it

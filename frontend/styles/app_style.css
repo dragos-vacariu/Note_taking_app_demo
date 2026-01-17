@@ -381,14 +381,87 @@ header {
     box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
+.jour_entry #text_editor_toolbar {
+    display: flex;
+    gap: 2px;
+    height: auto;
+    padding: 0px;
+    border: none 1px rgba(0,0,0,0.6);
+    overflow: hidden;         /* IMPORTANT */
+}
+
+#text_editor_toolbar .toolbar_button
+{
+    margin: 2px;
+    padding: 3px 5px;
+    border: groove 1px #555555;
+    border-radius: 0px;
+    background-color: rgba(100 100 100, 1.0);
+    height: 26px;            /* force consistent height */
+    color: #555555;
+    font: var(--button-font);
+    cursor: pointer;
+    
+}
+
+#text_editor_toolbar .colorPicker{
+    position: relative;
+    top: 3px;
+    margin: 2px;
+    padding: 0px;
+    height: 26px;            /* force consistent height */
+    /* Remove native styles */
+    appearance: none;
+    -webkit-appearance: none;
+
+}
+
+#text_editor_toolbar .fontSizeSelect{
+    position: relative;
+
+    margin: 2px;
+    padding: 0px 2px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    line-height: 1.0;
+
+
+    min-height: 26px;        /* force consistent min-height */
+    height: 26px;            /* force consistent height */
+    box-sizing: border-box;
+
+    border-radius: 0px;
+    border: 1px solid black;
+    background-color: #fff;
+}
+
+#text_editor_toolbar .toolbar_button:hover, #text_editor_toolbar .colorPicker:hover
+{
+    background-color: lightgray !important;
+    transition: background-color 0.5s;
+}
+#text_editor_toolbar .fontSizeSelect:hover
+{
+    font-weight: bold;
+    transition: font-weight 0.5s;
+}
+
 #collapseableDiv{
     padding:0px;
 }
 
-.jour_entry #jour_entry_title, .jour_entry #jour_entry_content, .jour_entry #text_editor_toolbar,
+#note_timestamp{
+    color: rgba(0,0,0,0.5);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.jour_entry #jour_entry_title, .jour_entry #jour_entry_content,
 .jour_entry #jour_entry_tags
 {
-    border: groove 1px rgba(0,0,0,0.1);
+    border: none 1px rgba(0,0,0,0.1);
     border-radius: 5px;
 }
 
@@ -407,7 +480,7 @@ header {
 .jour_entry #jour_entry_title
 {
     font: var(--post-title-font);
-    color: var(--darkblue-color);
+    color: black;
 }
 
 .jour_entry #jour_entry_content
@@ -520,58 +593,6 @@ header {
     pointer-events: none; /* prevent clicks */
 }
 
-
-.jour_entry #text_editor_toolbar
-{
-    padding: 0px 6px;
-    font: var(--button-font);
-    cursor: pointer;
-    height: 26px;            /* force consistent height */
-    display: flex;
-    align-items: center;
-    margin-bottom: 6px;
-}
-
-#text_editor_toolbar .toolbar_button
-{
-    padding: 3px 5px;
-    border: groove 1px #555555;
-    border-radius: 0px;
-    background-color: rgba(100 100 100, 1.0);
-    height: 26px;            /* force consistent height */
-    color: #555555;
-    font: var(--button-font);
-    cursor: pointer;
-    
-}
-
-#text_editor_toolbar .colorPicker{
-    position: relative;
-    top: 3px;
-    margin: 0px 2px;
-    padding: 0px;
-    height: 26px;            /* force consistent height */
-    /* Remove native styles */
-    appearance: none;
-    -webkit-appearance: none;
-
-}
-
-#text_editor_toolbar .fontSizeSelect{
-    position: relative;
-
-    margin: 0px 2px;
-    padding: 0px;
-    height: 26px;            /* force consistent height */
-    /* Remove native styles */
-}
-
-#text_editor_toolbar .toolbar_button:hover
-{
-    background-color: var(--blue-color);
-    color: white;
-}
-
 #postControls {
     display: flex;
     flex-direction: row-reverse;
@@ -605,9 +626,10 @@ header {
     /*text-orientation: mixed;*/ /* ensures proper orientation for characters */
 }
 
-.dropdown #dropbtn:hover, #close_button:hover, #copy_clipboard:hover, #dragHandleButton:hover
+.dropdown #dropbtn:hover, #close_button:hover, #copy_clipboard:hover, #dragHandleButton:hover, 
+.add_fab:hover, .sidebar_toggle:hover
 {
-    background-color: #00d;
+    background-color: #00d !important;
     color: white;
 }
 /* Container for the dropdown menu */
