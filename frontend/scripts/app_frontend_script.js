@@ -536,6 +536,14 @@ function discard(e)
 
 function enterEditMode(entry_post)
 {
+    /*If in edit mode... only close the edit mode*/
+    if(document.querySelector(".edit_mode"))
+    {
+        alert("You're already in edit mode.")
+        return;
+    }
+    
+    //Continue only if not already in edit_more.
     const jourEntryButtons = entry_post.querySelector("#jour_entry_buttons");
     
     const titleDiv = entry_post.querySelector("#jour_entry_title");
