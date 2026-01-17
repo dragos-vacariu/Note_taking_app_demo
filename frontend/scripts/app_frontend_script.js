@@ -42,7 +42,7 @@ async function displayNotes()
     const tags = new Set(); // Use a Set to avoid duplicates
     for (const note of NOTES_CACHE)
     {
-        await addNoteToUI(note.title, note.content, note.tags, note.id);
+        await addNoteToUI(note.title, note.content, note.tags, note.id, note.editDate);
         if(visibleNotes.includes(note.id) == false)
         {
             visibleNotes.push(note.id)
@@ -98,7 +98,7 @@ function toggleDropdown(button)
 // ---------------------------------------------------------
 // Function used to add a Note to the UI/Web Page
 // ---------------------------------------------------------
-async function addNoteToUI(title, content, tags, id) 
+async function addNoteToUI(title, content, tags, id, editDate=undefined) 
 {
     //CREATING A POST
     const entryDiv = document.createElement('div');
@@ -156,6 +156,16 @@ async function addNoteToUI(title, content, tags, id)
     dragHandle.title = 'Drag & Drop Handler';
     postControls.appendChild(dragHandle);
     
+    const postDetails = document.createElement('button');
+    postDetails.id = 'postDetailsButton';
+    postDetails.className = 'post_details_button';
+    postDetails.innerText = 'ℹ️';
+    postDetails.title = 'Post Details';
+    postDetails.onclick = function(e) {
+        showHidePostDetails(e);
+    };
+    postControls.appendChild(postDetails);
+    
     const statusInfo = document.createElement('span');
     statusInfo.id = 'statusInfo';
     statusInfo.innerText = 'status';
@@ -167,7 +177,13 @@ async function addNoteToUI(title, content, tags, id)
     const timestamp = document.createElement('span');
     timestamp.id = 'note_timestamp';
     let post_date = id.replace("note-", "");
-    post_date = formatTimestamp(post_date);
+    post_date = "Posted at: " + formatTimestamp(post_date);
+    
+    if(editDate)
+    {
+        post_date = post_date + "\nLast edited at: " + formatTimestamp(editDate);
+    }
+    
     timestamp.innerText = post_date;
     postHeader.appendChild(timestamp);
     
@@ -433,6 +449,7 @@ async function saveEdit(e)
     const noteId = entry_post.dataset.id;
     
     const titleDiv = entry_post.querySelector("#jour_entry_title");
+    const note_timestamp = entry_post.querySelector("#note_timestamp");
     const contentDiv = entry_post.querySelector("#jour_entry_content");
     const tagsDiv = entry_post.querySelector("#jour_entry_tags");
     const collapsableDiv = entry_post.querySelector("#collapseableDiv");
@@ -460,6 +477,8 @@ async function saveEdit(e)
             NOTES_CACHE[idx].title = title;
             NOTES_CACHE[idx].content = content;
             NOTES_CACHE[idx].tags = tags;
+            NOTES_CACHE[idx].editDate = Date.now();
+            note_timestamp.innerText += "\nLast edited at: " + formatTimestamp(NOTES_CACHE[idx].editDate) 
         }
         
         else
@@ -813,7 +832,7 @@ async function filterNotesByTag(tag)
     {
         if(note.tags.includes(tag))
         {
-            await addNoteToUI(note.title, note.content, note.tags, note.id);
+            await addNoteToUI(note.title, note.content, note.tags, note.id, note.editDate);
             if(visibleNotes.includes(note.id) == false)
             {
                 visibleNotes.push(note.id)
@@ -918,7 +937,7 @@ async function selectAllElements()
     
     for (const note of NOTES_CACHE)
     {
-        await addNoteToUI(note.title, note.content, note.tags, note.id);
+        await addNoteToUI(note.title, note.content, note.tags, note.id, note.editDate);
         if(visibleNotes.includes(note.id) == false)
         {
             visibleNotes.push(note.id)
@@ -1033,7 +1052,7 @@ async function performSearch()
         {
             if(note.title.includes(searchValue) || note.content.includes(searchValue) || note.tags.includes(searchValue))
             {
-                await addNoteToUI(note.title, note.content, note.tags, note.id);
+                await addNoteToUI(note.title, note.content, note.tags, note.id, note.editDate);
             }
         }
     }
@@ -1046,7 +1065,7 @@ async function performSearch()
             if (index !== -1)
             {
                 /*if the item was selected/visible before the search*/
-                await addNoteToUI(note.title, note.content, note.tags, note.id);
+                await addNoteToUI(note.title, note.content, note.tags, note.id, note.editDate);
             }
         }
     }
@@ -1148,6 +1167,25 @@ function formatTimestamp(timestamp)
     const seconds = String(date.getSeconds()).padStart(2, '0');
 
     return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+}
+
+function showHidePostDetails(e)
+{
+    const entry_post = e.currentTarget.closest(".jour_entry");
+    const postDetails = entry_post.querySelector("#note_timestamp");
+    
+    if(postDetails)
+    {
+        postDetailsStyle = window.getComputedStyle(postDetails);
+        if(postDetailsStyle.display == "none")
+        {
+            postDetails.style.display = "block"
+        }
+        else
+        {
+            postDetails.style.display = "none"
+        }
+    }
 }
 
 //Add dropdown handler: If dropdown content is displayed hide the content when clicking outside of it

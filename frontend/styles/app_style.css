@@ -453,6 +453,7 @@ header {
 }
 
 #note_timestamp{
+    display: none;
     color: rgba(0,0,0,0.5);
     font-size: 12px;
     font-weight: bold;
@@ -608,7 +609,7 @@ header {
     margin: 0.5% 1%;
 }
 
-.dropdown #dropbtn, #close_button, #copy_clipboard, #dragHandleButton
+.dropdown #dropbtn, #close_button, #copy_clipboard, #dragHandleButton, #postDetailsButton
 {
     border: none 1px #ccc;
     color: var(--blue-color);
@@ -627,7 +628,7 @@ header {
 }
 
 .dropdown #dropbtn:hover, #close_button:hover, #copy_clipboard:hover, #dragHandleButton:hover, 
-.add_fab:hover, .sidebar_toggle:hover
+.add_fab:hover, .sidebar_toggle:hover, #postDetailsButton:hover
 {
     background-color: #00d !important;
     color: white;

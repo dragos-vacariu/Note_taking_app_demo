@@ -93,7 +93,8 @@ async function loadNotes(payload)
                 }
             }
             
-            NOTES_CACHE.push({ id: note.id, title: decryptedTitle, content: decryptedContent, tags: decryptedTags});
+            NOTES_CACHE.push({ id: note.id, title: decryptedTitle, content: decryptedContent, 
+                            tags: decryptedTags, editDate: note.editDate});
         }
 
         //console.log("Notes read: ", NOTES_CACHE);
@@ -166,7 +167,7 @@ async function getEncryptedNotes(MEK_Key)
         const encryptedContent = await encryptData(MEK_Key, note.content);
         const encryptedTags = await encryptData(MEK_Key, note.tags);
         encrypted_notes.push( {id: note.id, title: encryptedTitle, 
-                                content: encryptedContent, tags: encryptedTags} );
+                                content: encryptedContent, tags: encryptedTags, editDate: note.editDate} );
     }
     return encrypted_notes;
 }
