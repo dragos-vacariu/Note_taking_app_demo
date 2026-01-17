@@ -452,8 +452,11 @@ header {
     padding:0px;
 }
 
-#note_timestamp{
+#note_timestamp
+{
     display: none;
+    padding: 5px;
+    line-height: 1.2rem;
     color: rgba(0,0,0,0.5);
     font-size: 12px;
     font-weight: bold;
