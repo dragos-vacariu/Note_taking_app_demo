@@ -51,7 +51,7 @@ header {
 
 
 #jour_navigation {
-    position: sticky !important;
+    position: sticky;
     top: 65px;            /* adjust for header height */
     display: flex;
     flex-direction: row;  /* sidebar + toggle button */
@@ -288,7 +288,7 @@ header {
     border: none;
     cursor: pointer;
 
-    z-index: 1000;
+    z-index: 1;
 }
 
 /* RIGHT CONTENT AREA */
